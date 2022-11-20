@@ -40,6 +40,8 @@ android {
     }
     buildFeatures {
         viewBinding true
+        //启用数据绑定，使用binding. 代替findViewById()
+        dataBinding true
     }
 }
 
@@ -81,4 +83,7 @@ dependencies {
 
     //timber日志类
     implementation 'com.jakewharton.timber:timber:4.7.1'
+
+    //下拉刷新菜单布局
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 }
