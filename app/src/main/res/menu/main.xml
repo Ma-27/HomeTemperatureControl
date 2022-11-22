@@ -6,4 +6,10 @@
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/menu_refresh"
+        android:title="刷新网络状态"
+        app:showAsAction="never" />
+
 </menu>
