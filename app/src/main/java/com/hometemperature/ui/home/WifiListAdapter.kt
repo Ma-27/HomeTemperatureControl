@@ -7,16 +7,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.hometemperature.bean.WifiItem
 import com.hometemperature.databinding.ItemWifiBinding
 
-class WifiListAdapter :
+class WifiListAdapter(private val clickListener: WifiListClickListener) :
     ListAdapter<WifiItem, WifiListAdapter.ViewHolder>(WifiListDiffUtilCallback()) {
 
     //承载每个item数据的view holder
-    class ViewHolder private constructor(val binding: ItemWifiBinding) :
+    class ViewHolder private constructor(private val binding: ItemWifiBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: WifiItem) {
+        fun bind(item: WifiItem, clickListener: WifiListClickListener) {
             binding.wifiitem = item
             binding.executePendingBindings()
+            binding.clickListener = clickListener
         }
 
         companion object {
@@ -34,6 +35,10 @@ class WifiListAdapter :
 
     override fun onBindViewHolder(holder: WifiListAdapter.ViewHolder, position: Int) {
         val item = getItem(position)
-        holder.bind(item)
+        holder.bind(item, clickListener)
     }
+}
+
+class WifiListClickListener(val clickListener: (item: WifiItem) -> Unit) {
+    fun onClick(item: WifiItem) = clickListener(item)
 }

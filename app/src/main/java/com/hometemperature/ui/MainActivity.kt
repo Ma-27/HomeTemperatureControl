@@ -35,10 +35,12 @@ class MainActivity : AppCompatActivity() {
     private val REQUEST_ACCESS_WIFI_STATE = 2
     private val REQUEST_ACCESS_FINE_LOCATION = 3
     private val REQUEST_READ_PHONE_STATE = 4
+    private val REQUEST_CHANGE_WIFI_STATE = 5
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        //请求权限，处理权限问题
         permissionRequest()
         //初始化共享的view model
         homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
@@ -66,8 +68,6 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
-        //TODO 初始化wifi列表
-        homeViewModel.setRefreshChecked()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -99,15 +99,21 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun permissionRequest() {
-        //申请网络权限
+        //申请网络状态权限
         val permissionNetworkState =
             ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE)
+        //获取wifi状态
         val permissionWifiAccess =
             ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_WIFI_STATE)
+        //获取精确定位权限，这样才能获取到附近的wifi
         val permissionFineLocation =
             ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        //读取手机状态
         val permissionReadPhoneState =
             ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+        //修改wifi权限，允许app让设备连接到wifi
+        val permissionChangeWifiAccess =
+            ContextCompat.checkSelfPermission(this, Manifest.permission.CHANGE_WIFI_STATE)
 
         //索要网络权限
         if (permissionNetworkState != PackageManager.PERMISSION_GRANTED) {
@@ -142,7 +148,7 @@ class MainActivity : AppCompatActivity() {
             Timber.d("已授予高精度定位权限")
         }
 
-        //索要精度定位权限
+        //索要读取手机状态权限
         if (permissionReadPhoneState != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
                 this,
@@ -153,7 +159,16 @@ class MainActivity : AppCompatActivity() {
             Timber.d("已授予读取手机状态权限")
         }
 
-
+        //索要修改wifi连接权限
+        if (permissionChangeWifiAccess != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.CHANGE_WIFI_STATE),
+                REQUEST_CHANGE_WIFI_STATE
+            )
+        } else {
+            Timber.d("已授予高精度定位权限")
+        }
     }
 
     //权限请求和授予
@@ -174,6 +189,9 @@ class MainActivity : AppCompatActivity() {
             }
             REQUEST_READ_PHONE_STATE -> if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Timber.d("读取手机状态权限已经正常授予")
+            }
+            REQUEST_CHANGE_WIFI_STATE -> if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Timber.d("连接特定wifi权限已经正常授予")
             }
             else -> {
                 Toast.makeText(this, "请授权软件网络权限和位置信息权限", Toast.LENGTH_SHORT).show()

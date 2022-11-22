@@ -9,6 +9,6 @@ class WifiListDiffUtilCallback : DiffUtil.ItemCallback<WifiItem>() {
     }
 
     override fun areItemsTheSame(oldItem: WifiItem, newItem: WifiItem): Boolean {
-        return oldItem.name == newItem.name
+        return oldItem.wifiName == newItem.wifiName
     }
 }

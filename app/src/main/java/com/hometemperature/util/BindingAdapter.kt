@@ -7,10 +7,8 @@ import com.hometemperature.ui.home.WifiListAdapter
 
 class BindingAdapter
 
-/**
- *设置浏览历史上的一天的recycler view数据绑定
- */
-@BindingAdapter("app:setWifiDataList")
+//TODO set the list in view model and bind wifi list to recycler view
+@BindingAdapter("setWifiDataList")
 fun commitWifiList(listView: RecyclerView, items: List<WifiItem>?) {
     items?.let {
         (listView.adapter as WifiListAdapter).submitList(items)
