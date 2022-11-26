@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.hometemperature.bean.WifiItem
+import com.hometemperature.bean.item.WifiItem
 import com.hometemperature.databinding.ItemWifiBinding
 
 class WifiListAdapter(private val clickListener: WifiListClickListener) :

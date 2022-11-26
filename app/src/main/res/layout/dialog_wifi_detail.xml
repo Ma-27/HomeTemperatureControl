@@ -5,7 +5,7 @@
 
         <variable
             name="wifiitem"
-            type="com.hometemperature.bean.WifiItem" />
+            type="com.hometemperature.bean.item.WifiItem" />
     </data>
 
     <LinearLayout
@@ -40,5 +40,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="number" />
+
+        <TextView
+            android:id="@+id/tv_wifi_ip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="输入ip地址："
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/et_wifi_ip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 </layout>

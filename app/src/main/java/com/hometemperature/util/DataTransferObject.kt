@@ -1,7 +1,8 @@
 package com.hometemperature.util
 
 import android.net.wifi.ScanResult
-import com.hometemperature.bean.WifiItem
+import com.hometemperature.bean.flag.NetWorkDefaultConfiguration
+import com.hometemperature.bean.item.WifiItem
 
 //data class转换类，负责将一个data class转换为另一个，或者提取数据并映射
 class DataTransferObject {
@@ -17,11 +18,11 @@ class DataTransferObject {
                     frequency = it.frequency,
                     isConnected = "未连接",
                     password = "",
-                    deviceMacAddress = "ff:ff:ff:00:00:00",
-                    deviceIpAddress = "",
+                    deviceMacAddress = NetWorkDefaultConfiguration.DEFAULT_MAC_ADDRESS,
+                    deviceIpAddress = NetWorkDefaultConfiguration.DEFAULT_IP_ADDRESS,
                     apIpAddress = "",
-                    portNumber = -1,
-                    destinationPortNumber = -1,
+                    portNumber = NetWorkDefaultConfiguration.DEFAULT_PORT_NUMBER,
+                    destinationPortNumber = NetWorkDefaultConfiguration.DEFAULT_DESTINATION_PORT_NUMBER,
                     isAutoPortNumber = true
                 )
             }

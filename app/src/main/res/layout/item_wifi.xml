@@ -7,7 +7,7 @@
 
         <variable
             name="wifiitem"
-            type="com.hometemperature.bean.WifiItem" />
+            type="com.hometemperature.bean.item.WifiItem" />
 
         <variable
             name="clickListener"

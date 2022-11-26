@@ -11,12 +11,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.hometemperature.R
-import com.hometemperature.bean.NetWorkStatic.Companion.IOT_WLAN_COMMUNICATION_SERVICE
-import com.hometemperature.bean.WifiItem
+import com.hometemperature.bean.flag.NetWorkDefaultConfiguration
+import com.hometemperature.bean.item.WifiItem
 import com.hometemperature.databinding.DialogWifiDetailBinding
 import com.hometemperature.databinding.FragmentHomeBinding
-import com.hometemperature.network.NetService
-import com.hometemperature.network.NetWorkServiceFactory
 import timber.log.Timber
 
 
@@ -34,9 +32,6 @@ class HomeFragment : Fragment() {
 
     private lateinit var listAdapter: WifiListAdapter
 
-    //网络模块的处理对象
-    private lateinit var netService: NetService
-
     //本fragment的view model
     private lateinit var homeViewModel: HomeViewModel
 
@@ -46,13 +41,10 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_home, container, false)
-        homeViewModel = activity?.let { ViewModelProvider(it).get(HomeViewModel::class.java) }!!
+        homeViewModel = ViewModelProvider(this, HomeViewModelFactory(requireActivity().application))
+            .get(HomeViewModel::class.java)
         binding.viewmodel = homeViewModel
         binding.lifecycleOwner = viewLifecycleOwner
-
-        //创建网络服务
-        netService =
-            context?.let { NetWorkServiceFactory().build(IOT_WLAN_COMMUNICATION_SERVICE, it) }!!
 
         setupAdapter()
         setListener(container)
@@ -69,7 +61,7 @@ class HomeFragment : Fragment() {
     private fun setListener(container: ViewGroup?) {
         //上拉刷新控件的响应
         binding.swContainer.setOnRefreshListener {
-            checkWifiState(container)
+            checkWifiState()
             //重置刷新开关状态
             binding.viewmodel!!.clearRefreshChecked()
         }
@@ -77,7 +69,7 @@ class HomeFragment : Fragment() {
         //状态栏菜单中刷新
         binding.viewmodel!!.refreshIsChecked.observe(viewLifecycleOwner, Observer {
             if (it == true) {
-                checkWifiState(container)
+                checkWifiState()
                 //重置刷新开关状态
                 binding.viewmodel!!.clearRefreshChecked()
             }
@@ -85,9 +77,9 @@ class HomeFragment : Fragment() {
 
         //刷新状态更新的snackBar提示
         //FIXME 未知bug，如果传入binding.viewModel则会报错，明明两者持有相同的引用
-        homeViewModel.refreshStatus.observe(viewLifecycleOwner, Observer {
+        homeViewModel.networkStatus.observe(viewLifecycleOwner, Observer {
             if (container != null) {
-                homeViewModel.refreshStatus.value?.let { it ->
+                homeViewModel.networkStatus.value?.let { it ->
                     Snackbar.make(container, it, Snackbar.LENGTH_SHORT).show()
                 }
             }
@@ -98,7 +90,7 @@ class HomeFragment : Fragment() {
     private fun setupAdapter() {
         val viewModel = binding.viewmodel
         if (viewModel != null) {
-            //TODO 初始化recycler view adapter并且在这里添加点击响应回调,也在这里设置点击监听
+            //TODO 初始化recycler view adapter也在这里设置点击监听，点击即弹出对话框配置网络参数
             listAdapter = WifiListAdapter(WifiListClickListener { item ->
                 showWifiItemDetail(item)
                 Timber.d("成功点击$item")
@@ -135,7 +127,7 @@ class HomeFragment : Fragment() {
                 .setNegativeButton("取消") { dialog, which -> }
                 //断开与当前wifi的连接
                 .setNeutralButton("断开连接") { dialog, which ->
-                    netService.disConnectWifi(homeViewModel)
+                    homeViewModel.disConnectWifi(homeViewModel.repository)
                 }
                 //连接到这个wifi
                 .setPositiveButton("连接") { dialog, which ->
@@ -144,23 +136,27 @@ class HomeFragment : Fragment() {
                     item.portNumber =
                         if (wifiDetailBinding.etWifiPort.text.toString() != "") Integer.valueOf(
                             wifiDetailBinding.etWifiPort.text.toString()
-                        ) else 0
+                        ) else NetWorkDefaultConfiguration.DEFAULT_PORT_NUMBER
+
+                    item.deviceIpAddress = if (wifiDetailBinding.etWifiIp.text.toString() != "")
+                        wifiDetailBinding.etWifiIp.text.toString()
+                    else NetWorkDefaultConfiguration.DEFAULT_IP_ADDRESS
+
                     item.isAutoPortNumber = wifiDetailBinding.cbIsDefault.isChecked
 
-                    netService.connectToSpecifiedWifi(homeViewModel, item)
+                    homeViewModel.setWifiItem(item)
+                    //连接到特定的wifi
+                    homeViewModel.connectToSpecifiedWifi(item, homeViewModel.repository)
                 }
                 .setView(wifiDetailBinding.root)
                 .show()
         }
     }
 
-    //响应刷新命令
-    private fun checkWifiState(container: ViewGroup?) {
-        //log记录按钮按下，已经刷新
-        Timber.d("刷新wifi按钮已按下")
-
+    //响应刷新网络列表命令
+    private fun checkWifiState() {
         //调用网络模块进行刷新
-        netService.checkNetworkState(homeViewModel)
+        homeViewModel.checkNetworkState(homeViewModel.repository)
 
         //停止swipe refresh layout刷新
         if (binding.swContainer.isRefreshing) {

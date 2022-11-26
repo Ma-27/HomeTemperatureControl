@@ -1,4 +1,6 @@
-package com.hometemperature.bean
+package com.hometemperature.bean.item
+
+import com.hometemperature.bean.flag.NetWorkDefaultConfiguration
 
 data class WifiItem(
     val wifiName: String,
@@ -7,8 +9,8 @@ data class WifiItem(
     val frequency: Int,
     val isConnected: String,
     var password: String,
-    val deviceMacAddress: String = "ff:ff:ff:00:00:00",
-    val deviceIpAddress: String,
+    val deviceMacAddress: String = NetWorkDefaultConfiguration.DEFAULT_MAC_ADDRESS,
+    var deviceIpAddress: String,
     val apIpAddress: String,
     var portNumber: Int,
     val destinationPortNumber: Int,

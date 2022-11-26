@@ -14,12 +14,12 @@
     <fragment
         android:id="@+id/nav_gallery"
         android:name="com.hometemperature.ui.console.ConsoleFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
+        android:label="@string/menu_console"
+        tools:layout="@layout/fragment_console" />
 
     <fragment
         android:id="@+id/nav_slideshow"
         android:name="com.hometemperature.ui.datacenter.DataCenterFragment"
-        android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        android:label="@string/menu_datacenter"
+        tools:layout="@layout/fragment_datacenter" />
 </navigation>
