@@ -18,6 +18,7 @@ import com.hometemperature.databinding.FragmentHomeBinding
 import timber.log.Timber
 
 
+@Suppress("NAME_SHADOWING")
 class HomeFragment : Fragment() {
 
     //该fragment的视图绑定
@@ -57,6 +58,12 @@ class HomeFragment : Fragment() {
         _binding = null
     }
 
+    override fun onDetach() {
+        super.onDetach()
+        //断开连接
+        homeViewModel.disConnectWifi(homeViewModel.repository)
+    }
+
     //创建各个控件的点击响应监听
     private fun setListener(container: ViewGroup?) {
         //上拉刷新控件的响应
@@ -82,6 +89,30 @@ class HomeFragment : Fragment() {
                 homeViewModel.networkStatus.value?.let { it ->
                     Snackbar.make(container, it, Snackbar.LENGTH_SHORT).show()
                 }
+            }
+        })
+
+        //socket发生改变时通知repository刷新socket
+        //FIXME 粗浅的修补了bug：切换时防止为空集合
+        homeViewModel.socket.observe(viewLifecycleOwner, Observer {
+            if (homeViewModel.usageCount != 0 && homeViewModel.repository.wifiItem.value!!.isConnected == "已连接") {
+                homeViewModel.notifySocketChanged(homeViewModel.repository)
+            }
+            homeViewModel.usageCount++
+            if (homeViewModel.usageCount > 9) {
+                homeViewModel.usageCount = 1
+            }
+        })
+
+        //在收到新数据后重置一个接收线程，使得app一直处于接收数据状态
+        //FIXME 粗浅的修补了bug：切换时防止为空集合
+        homeViewModel.repository.dataReceiveCache.observe(viewLifecycleOwner, Observer {
+            if (homeViewModel.usageCount1 != 0 && homeViewModel.repository.wifiItem.value!!.isConnected == "已连接") {
+                homeViewModel.notifyDataReceiving(homeViewModel.repository)
+            }
+            homeViewModel.usageCount1++
+            if (homeViewModel.usageCount1 > 9) {
+                homeViewModel.usageCount1 = 1
             }
         })
     }
@@ -133,16 +164,15 @@ class HomeFragment : Fragment() {
                 .setPositiveButton("连接") { dialog, which ->
                     //填充在dialog中选择的参数
                     item.password = wifiDetailBinding.etWifiCode.text.toString()
+                    //端口号自动填充为默认值8080
                     item.portNumber =
                         if (wifiDetailBinding.etWifiPort.text.toString() != "") Integer.valueOf(
                             wifiDetailBinding.etWifiPort.text.toString()
                         ) else NetWorkDefaultConfiguration.DEFAULT_PORT_NUMBER
-
+                    //ip地址自动填充为默认值192.168.4.1
                     item.deviceIpAddress = if (wifiDetailBinding.etWifiIp.text.toString() != "")
                         wifiDetailBinding.etWifiIp.text.toString()
                     else NetWorkDefaultConfiguration.DEFAULT_IP_ADDRESS
-
-                    item.isAutoPortNumber = wifiDetailBinding.cbIsDefault.isChecked
 
                     homeViewModel.setWifiItem(item)
                     //连接到特定的wifi

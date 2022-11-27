@@ -8,7 +8,5 @@ class NetWorkDefaultConfiguration {
         const val DEFAULT_IP_ADDRESS = "192.168.4.1"
 
         const val DEFAULT_MAC_ADDRESS = "ff:ff:ff:00:00:00"
-
-        const val DEFAULT_DESTINATION_PORT_NUMBER = -1
     }
 }

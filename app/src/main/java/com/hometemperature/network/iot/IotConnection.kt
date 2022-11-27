@@ -1,7 +1,8 @@
-package com.hometemperature.network
+package com.hometemperature.network.iot
 
 import com.hometemperature.bean.item.WifiItem
 import com.hometemperature.database.AppRepository
+import com.hometemperature.network.NetWorkService
 
 //网络请求中连接wifi的接口
 interface IotConnection : NetWorkService {

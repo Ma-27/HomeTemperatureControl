@@ -4,11 +4,12 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.hometemperature.bean.item.WifiItem
-import com.hometemperature.network.IotConnection
-import com.hometemperature.network.IotTransmission
 import com.hometemperature.network.NetWorkServiceFactory
+import com.hometemperature.network.iot.IotConnection
+import com.hometemperature.network.iot.IotTransmission
 import com.hometemperature.util.itembuild.WifiItemBuilder
-import timber.log.Timber
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.net.Socket
 
 /*
@@ -52,7 +53,7 @@ class AppRepository(context: Context) {
         //创建网络数据传输服务
         iotTransmission =
             context.let {
-                NetWorkServiceFactory().buildIotTransmissionService(it)
+                NetWorkServiceFactory().buildIotTransmissionService()
             }
 
     }
@@ -70,7 +71,7 @@ class AppRepository(context: Context) {
     }
     var wifiList: LiveData<List<WifiItem>> = _wifiList
 
-    //TODO 检查网络状态，暂存网络状态
+    //TODO SnackBar提示字符串变量
     private val _networkStatus = MutableLiveData<String>().apply {
         value = "向下滑动来刷新WLAN列表"
     }
@@ -91,6 +92,19 @@ class AppRepository(context: Context) {
     val socket: LiveData<Socket>
         get() = _socket
 
+    //TODO 要接收的数据缓存（相比起数据列表更容易access）
+    private val _dataReceiveCache = MutableLiveData<String>().apply {
+        value = String()
+    }
+    val dataReceiveCache: LiveData<String>
+        get() = _dataReceiveCache
+
+    //TODO 要发送的数据缓存（相比起数据列表更容易access）
+    private val _dataSendCache = MutableLiveData<String>().apply {
+        value = String()
+    }
+    val dataSendCache: LiveData<String>
+        get() = _dataSendCache
 
     /**
      * 各自字段的setter方法
@@ -117,8 +131,19 @@ class AppRepository(context: Context) {
         _refreshIsChecked.value = false
     }
 
+    //连接到wifi之后，设置端口
     fun setSocket(value: Socket) {
         _socket.postValue(value)
+    }
+
+    //接收缓存
+    fun setDataReceiveCache(data: String) {
+        _dataReceiveCache.postValue(data)
+    }
+
+    //发送缓存
+    fun setDataSendCache(data: String) {
+        _dataSendCache.postValue(data)
     }
 
 
@@ -134,16 +159,30 @@ class AppRepository(context: Context) {
     //连接到指定wifi，wifiItem中含有wifi参数
     fun connectToSpecifiedWifi(item: WifiItem, repository: AppRepository) {
         iotConnection.connectToSpecifiedWifi(item, repository)
-        if (socket.value != null && networkStatus.value == "连接WLAN成功") {
-            //接收连接成功后刚发过来的数据
-            iotTransmission.onStartConnection(this)
-        } else {
-            Timber.w("repository中连接到指定wifi后，socket为空")
-        }
     }
 
     //断开与现在的wifi的连接
     fun disConnectWifi(repository: AppRepository) {
         iotConnection.disConnectWifi(repository)
+    }
+
+    //提醒repository，设备已经接收到wifi发来的数据了
+    suspend fun notifyDataReceiving(repository: AppRepository) {
+        withContext(Dispatchers.IO) {
+            iotTransmission.onReceiveData(repository)
+        }
+    }
+
+    //提醒repository socket已经改变
+    suspend fun notifySocketChanged(repository: AppRepository) {
+        //在本app中，socket是连接的最后一步，如果成功生成或者更改了socket，则可以监听数据发送，这里需要提示刷新数据
+        notifyDataReceiving(repository)
+    }
+
+    //向目标主机发送数据,发送数据方法：1.将数据存入repository send cache中 2.调用此方法
+    suspend fun sendData(repository: AppRepository) {
+        withContext(Dispatchers.IO) {
+            iotTransmission.onSendData(repository)
+        }
     }
 }

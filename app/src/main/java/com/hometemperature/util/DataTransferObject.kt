@@ -21,9 +21,7 @@ class DataTransferObject {
                     deviceMacAddress = NetWorkDefaultConfiguration.DEFAULT_MAC_ADDRESS,
                     deviceIpAddress = NetWorkDefaultConfiguration.DEFAULT_IP_ADDRESS,
                     apIpAddress = "",
-                    portNumber = NetWorkDefaultConfiguration.DEFAULT_PORT_NUMBER,
-                    destinationPortNumber = NetWorkDefaultConfiguration.DEFAULT_DESTINATION_PORT_NUMBER,
-                    isAutoPortNumber = true
+                    portNumber = NetWorkDefaultConfiguration.DEFAULT_PORT_NUMBER
                 )
             }
         }

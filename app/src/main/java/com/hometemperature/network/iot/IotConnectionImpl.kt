@@ -1,4 +1,4 @@
-package com.hometemperature.network
+package com.hometemperature.network.iot
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -49,11 +49,9 @@ class IotConnectionImpl(private val context: Context) : IotConnection {
         // 扫描失败后报错
         if (!success) {
             repository.setNetWorkStatus("刷新wifi列表失败，请检查网络状态")
-            Timber.d("刷新wifi列表失败，请检查网络状态")
+            Timber.w("刷新wifi列表失败，请检查网络状态")
         }
 
-        //log记录按钮按下，已经刷新
-        Timber.d("刷新wifi按钮已按下")
     }
 
     override fun connectToSpecifiedWifi(item: WifiItem, repository: AppRepository) {
@@ -93,7 +91,7 @@ class IotConnectionImpl(private val context: Context) : IotConnection {
         connectivityManager.requestNetwork(request, networkCallback)
     }
 
-    //FIXME
+    //FIXME 从android10以上，disconnect被禁用 该方法不适用于该版本之上
     override fun disConnectWifi(repository: AppRepository) {
         wifiManager.disconnect()
         repository.setNetWorkStatus("已断开WLAN连接")
@@ -110,22 +108,30 @@ class IotConnectionImpl(private val context: Context) : IotConnection {
             )
 
             socket.let {
+                //修改保存的网络信息为已连接，此行必须在set之前
+                repository.wifiItem.value!!.isConnected = "已连接"
                 //保存socket
                 repository.setSocket(socket)
                 //提示连接成功
                 repository.setNetWorkStatus(context.getString(R.string.connection_succeed))
+                Timber.d("成功连接指定wifi")
             }
-
         } catch (e: SocketException) {
-            repository.setNetWorkStatus("连接被拒绝,请检查网络状态和输入的ip地址与端口号")
-            Timber.e("用户输入了错误的ip地址或者端口号：ip与端口号")
+            repository.setNetWorkStatus("连接被拒绝,目标主机可能未准备好，请等待目标主机或者忘记网络后重试")
+            Timber.e("连接被拒绝,目标主机可能未准备好，请等待目标主机或者忘记网络后重试")
             Timber.e(repository.wifiItem.value!!.deviceIpAddress)
             Timber.e(repository.wifiItem.value!!.portNumber.toString())
             e.printStackTrace()
-        } catch (_: Exception) {
-            repository.setNetWorkStatus("端口号或者ip地址输入错误，请重新输入")
+            Timber.e(e.message)
+        } catch (exception: Exception) {
+            repository.setNetWorkStatus("在初始化端口时遇到了未知的错误")
             Timber.e("在初始化端口时遇到了未知的错误")
+            exception.printStackTrace()
+            Timber.e(exception.message)
+        } finally {
+            //一般都不会出现这个exception
+            //出现这个就说明当前设备需要忘记网络，不能重复连接
+            // failed to connect to /192.168.4.1 (port 8080) from /:: (port 57752): connect failed: ECONNABORTED (Software caused connection abort)
         }
-
     }
 }

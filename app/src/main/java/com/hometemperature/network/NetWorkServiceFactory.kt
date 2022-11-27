@@ -3,6 +3,8 @@ package com.hometemperature.network
 import android.content.Context
 import com.hometemperature.bean.flag.NetWorkStatic.Companion.IOT_WLAN_CONNECTION_SERVICE
 import com.hometemperature.bean.flag.NetWorkStatic.Companion.IOT_WLAN_TRANSMISSION_SERVICE
+import com.hometemperature.network.iot.IotConnectionImpl
+import com.hometemperature.network.iot.IotTransmissionImpl
 
 //工厂方法，通过选择不同的网络类型返回不同的网络服务实例，屏蔽掉context和网络接口的具体实现
 class NetWorkServiceFactory {
@@ -17,7 +19,7 @@ class NetWorkServiceFactory {
             }
             IOT_WLAN_TRANSMISSION_SERVICE -> {
                 //单例模式，确保只有一个服务类在运行
-                return buildIotTransmissionService(context)
+                return buildIotTransmissionService()
             }
 
             else -> IotConnectionImpl(context)
@@ -37,12 +39,12 @@ class NetWorkServiceFactory {
         }
     }
 
-    fun buildIotTransmissionService(context: Context): IotTransmissionImpl {
+    fun buildIotTransmissionService(): IotTransmissionImpl {
         synchronized(this) {
             var instance = INSTANCE_TRANSMISSION
 
             if (instance == null) {
-                instance = IotTransmissionImpl(context)
+                instance = IotTransmissionImpl()
             }
 
             // 返回一个实例

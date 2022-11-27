@@ -16,9 +16,7 @@ class WifiItemBuilder {
                 NetWorkDefaultConfiguration.DEFAULT_MAC_ADDRESS,
                 NetWorkDefaultConfiguration.DEFAULT_IP_ADDRESS,
                 "",
-                NetWorkDefaultConfiguration.DEFAULT_PORT_NUMBER,
-                1,
-                true
+                NetWorkDefaultConfiguration.DEFAULT_PORT_NUMBER
             )
         }
     }
