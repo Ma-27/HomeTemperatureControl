@@ -2,7 +2,7 @@ package com.hometemperature.util
 
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.hometemperature.bean.WifiItem
+import com.hometemperature.bean.item.WifiItem
 import com.hometemperature.ui.home.WifiListAdapter
 
 class BindingAdapter

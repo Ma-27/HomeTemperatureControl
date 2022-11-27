@@ -1,33 +1,24 @@
 package com.hometemperature.ui
 
-import android.Manifest
-import android.content.pm.PackageManager
-import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
-import com.hometemperature.R
-import com.hometemperature.database.AppRepository
-import com.hometemperature.databinding.ActivityMainBinding
-import timber.log.Timber
-
+import android.Manifest import android.content.pm.PackageManager import android.os.Bundle import
+android.view.Menu import android.view.MenuItem import android.widget.Toast import
+androidx.appcompat.app.AppCompatActivity import androidx.core.app.ActivityCompat import
+androidx.core.content.ContextCompat import androidx.drawerlayout.widget.DrawerLayout import
+androidx.lifecycle.ViewModelProvider import androidx.navigation.findNavController import
+androidx.navigation.ui.AppBarConfiguration import androidx.navigation.ui.navigateUp import
+androidx.navigation.ui.setupActionBarWithNavController import
+androidx.navigation.ui.setupWithNavController import
+com.google.android.material.navigation.NavigationView import
+com.google.android.material.snackbar.Snackbar import com.hometemperature.R import
+com.hometemperature.database.AppRepository import
+com.hometemperature.databinding.ActivityMainBinding import com.hometemperature.ui.home.HomeViewModel
+import com.hometemperature.ui.home.HomeViewModelFactory import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
-    private lateinit var appRepository: AppRepository
+    private lateinit var appRepository : AppRepository
 
     private val REQUEST_ACCESS_NETWORK_STATE = 0
     private val REQUEST_INTERNET_STATE = 1
@@ -61,7 +52,7 @@ class MainActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_home, R.id.nav_console, R.id.nav_datacenter
+                R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow
             ), drawerLayout
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -114,59 +105,25 @@ class MainActivity : AppCompatActivity() {
         val permissionChangeWifiAccess =
             ContextCompat.checkSelfPermission(this, Manifest.permission.CHANGE_WIFI_STATE)
 
-        //索要网络权限
-        if (permissionNetworkState != PackageManager.PERMISSION_GRANTED) {
+        //索要网络权限,wifi权限
+        if (permissionNetworkState  != PackageManager.PERMISSION_GRANTED &&
+            permissionWifiAccess  != PackageManager.PERMISSION_GRANTED &&
+            permissionFineLocation  != PackageManager.PERMISSION_GRANTED &&
+            permissionReadPhoneState  != PackageManager.PERMISSION_GRANTED &&
+            permissionChangeWifiAccess  != PackageManager.PERMISSION_GRANTED) {
+
             ActivityCompat.requestPermissions(
                 this,
-                arrayOf(Manifest.permission.ACCESS_NETWORK_STATE),
+                arrayOf(Manifest.permission.ACCESS_NETWORK_STATE,
+                    Manifest.permission.ACCESS_WIFI_STATE,
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.READ_PHONE_STATE,
+                    Manifest.permission.CHANGE_WIFI_STATE,
+                ),
                 REQUEST_INTERNET_STATE
             )
         } else {
             Timber.d("已授予互联网权限")
-        }
-
-        //索要wifi权限
-        if (permissionWifiAccess != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACCESS_WIFI_STATE),
-                REQUEST_ACCESS_WIFI_STATE
-            )
-        } else {
-            Timber.d("已授予wifi权限")
-        }
-
-        //索要精度定位权限
-        if (permissionFineLocation != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                REQUEST_ACCESS_FINE_LOCATION
-            )
-        } else {
-            Timber.d("已授予高精度定位权限")
-        }
-
-        //索要读取手机状态权限
-        if (permissionReadPhoneState != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.READ_PHONE_STATE),
-                REQUEST_READ_PHONE_STATE
-            )
-        } else {
-            Timber.d("已授予读取手机状态权限")
-        }
-
-        //索要修改wifi连接权限
-        if (permissionChangeWifiAccess != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.CHANGE_WIFI_STATE),
-                REQUEST_CHANGE_WIFI_STATE
-            )
-        } else {
-            Timber.d("已授予修改wifi连接权限")
         }
     }
 
@@ -176,25 +133,13 @@ class MainActivity : AppCompatActivity() {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        when (requestCode) {
-            REQUEST_INTERNET_STATE -> if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Timber.d("网络权限已经正常授予")
+        if (requestCode ==  REQUEST_INTERNET_STATE ){
+            for (i in permissions){
+                Timber.d("权限"+i)
             }
-            REQUEST_ACCESS_WIFI_STATE -> if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Timber.d("wifi权限已经正常授予")
-            }
-            REQUEST_ACCESS_FINE_LOCATION -> if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Timber.d("精确定位权限已经正常授予")
-            }
-            REQUEST_READ_PHONE_STATE -> if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Timber.d("读取手机状态权限已经正常授予")
-            }
-            REQUEST_CHANGE_WIFI_STATE -> if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Timber.d("连接特定wifi权限已经正常授予")
-            }
-            else -> {
-                Toast.makeText(this, "请授权软件网络权限和位置信息权限", Toast.LENGTH_SHORT).show()
-            }
+        }else{
+            Timber.w("授予权限的访问对象出错")
         }
     }
+
 }

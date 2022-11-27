@@ -2,9 +2,9 @@ package com.hometemperature.ui.datacenter
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.hometemperature.bean.ApplicationViewModel
+import androidx.lifecycle.ViewModel
 
-class DataCenterViewModel : ApplicationViewModel() {
+class DataCenterViewModel : ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
         value = "This is dataCenter Fragment"
