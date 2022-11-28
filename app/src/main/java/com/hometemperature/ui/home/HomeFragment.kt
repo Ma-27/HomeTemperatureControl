@@ -64,7 +64,7 @@ class HomeFragment : Fragment() {
         homeViewModel.disConnectWifi(homeViewModel.repository)
     }
 
-    //创建各个控件的点击响应监听
+    //创建各个控件的点击响应监听和变量状态改变监听
     private fun setListener(container: ViewGroup?) {
         //上拉刷新控件的响应
         binding.swContainer.setOnRefreshListener {

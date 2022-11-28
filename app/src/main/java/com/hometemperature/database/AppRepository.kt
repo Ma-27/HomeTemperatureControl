@@ -3,6 +3,8 @@ package com.hometemperature.database
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.hometemperature.bean.flag.TestFlag
+import com.hometemperature.bean.item.DataItem
 import com.hometemperature.bean.item.WifiItem
 import com.hometemperature.network.NetWorkServiceFactory
 import com.hometemperature.network.iot.IotConnection
@@ -92,16 +94,24 @@ class AppRepository(context: Context) {
     val socket: LiveData<Socket>
         get() = _socket
 
+    //TODO 数据中心中显示的数据列表
+    //为了应对set value 导致的list同步问题，如果需要更改该list，需要同步更改mdataList和dataList
+    private val mdataList: MutableList<DataItem> = ArrayList()
+    private val _dataList = MutableLiveData<MutableList<DataItem>>().apply {
+        value = mdataList
+    }
+    var dataList: LiveData<MutableList<DataItem>> = _dataList
+
     //TODO 要接收的数据缓存（相比起数据列表更容易access）
     private val _dataReceiveCache = MutableLiveData<String>().apply {
-        value = String()
+        value = TestFlag.RECEIVE
     }
     val dataReceiveCache: LiveData<String>
         get() = _dataReceiveCache
 
     //TODO 要发送的数据缓存（相比起数据列表更容易access）
     private val _dataSendCache = MutableLiveData<String>().apply {
-        value = String()
+        value = TestFlag.SEND
     }
     val dataSendCache: LiveData<String>
         get() = _dataSendCache
@@ -144,6 +154,13 @@ class AppRepository(context: Context) {
     //发送缓存
     fun setDataSendCache(data: String) {
         _dataSendCache.postValue(data)
+    }
+
+    //在数据中心的数据列表中添加
+    // 为了应对线程不同步问题，先从mdataList中添加元素，再将修改后的整个list传递给datalist
+    fun addDataItem(dataItem: DataItem) {
+        mdataList.add(dataItem)
+        _dataList.postValue(mdataList)
     }
 
 

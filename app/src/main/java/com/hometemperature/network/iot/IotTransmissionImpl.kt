@@ -1,5 +1,6 @@
 package com.hometemperature.network.iot
 
+import com.hometemperature.bean.flag.TransmissionStatus
 import com.hometemperature.database.AppRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -44,7 +45,13 @@ class IotTransmissionImpl : IotTransmission {
     }
 
     //当发送数据时，在此处理。FIXME 此处可能有socket空异常
-    override suspend fun onSendData(repository: AppRepository) {
+    override suspend fun onSendData(repository: AppRepository): Int {
+        //检查连接状态，如果没有连接就发送数据，则退出函数
+        if (repository.wifiItem.value!!.isConnected != "已连接") {
+            Timber.e("未连接到wifi就尝试发送数据")
+            return TransmissionStatus.FAIL
+        }
+
         dataOut = repository.dataSendCache.toString()
         val socket = repository.socket.value
         // 获取输出流.
@@ -60,6 +67,10 @@ class IotTransmissionImpl : IotTransmission {
             outputStream.close()
         }
         Timber.d("onStartConnection成功发送的数据如下：${dataOut.toByteArray()}")
+
+        //确认传输成功
+        //返回传输结果
+        return TransmissionStatus.SUCCESS
     }
 
     //获取以秒做单位的时间戳
