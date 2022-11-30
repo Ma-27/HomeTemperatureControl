@@ -103,18 +103,6 @@ class HomeFragment : Fragment() {
                 homeViewModel.usageCount = 1
             }
         })
-
-        //在收到新数据后重置一个接收线程，使得app一直处于接收数据状态
-        //FIXME 粗浅的修补了bug：切换时防止为空集合
-        homeViewModel.repository.dataReceiveCache.observe(viewLifecycleOwner, Observer {
-            if (homeViewModel.usageCount1 != 0 && homeViewModel.repository.wifiItem.value!!.isConnected == "已连接") {
-                homeViewModel.notifyDataReceiving(homeViewModel.repository)
-            }
-            homeViewModel.usageCount1++
-            if (homeViewModel.usageCount1 > 9) {
-                homeViewModel.usageCount1 = 1
-            }
-        })
     }
 
     //创建recycler view的适配器和recycler view的点击响应

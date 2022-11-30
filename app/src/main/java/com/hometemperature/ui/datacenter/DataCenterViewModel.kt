@@ -6,10 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hometemperature.bean.item.DataItem
 import com.hometemperature.database.AppRepository
+import com.hometemperature.network.NetWorkServiceFactory
 import kotlinx.coroutines.launch
 
 class DataCenterViewModel(private val application: Application) : ViewModel() {
-    private val _repository: AppRepository = AppRepository.getInstance(application)
+    private val _repository: AppRepository = AppRepository.getInstance(
+        NetWorkServiceFactory().buildIotConnectionService(application),
+        NetWorkServiceFactory().buildIotTransmissionService()
+    )
     var repository: AppRepository = _repository
 
     //检查网络状态，暂存网络状态
@@ -41,8 +45,12 @@ class DataCenterViewModel(private val application: Application) : ViewModel() {
 
     //将接收和发送的数据存入列表
     fun addDataToDataList(repository: AppRepository, dataItem: DataItem) {
-        repository.addDataItem(dataItem)
+        repository.addDataItemToList(dataItem)
     }
 
+    //修改发送缓存，相当于去直接发送数据
+    fun modifyReceiveCache(data: String) {
+        repository.setDataReceiveCache(data)
+    }
 
 }

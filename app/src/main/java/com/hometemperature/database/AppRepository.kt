@@ -1,29 +1,28 @@
 package com.hometemperature.database
 
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.hometemperature.bean.flag.TestFlag
 import com.hometemperature.bean.item.DataItem
 import com.hometemperature.bean.item.WifiItem
-import com.hometemperature.network.NetWorkServiceFactory
 import com.hometemperature.network.iot.IotConnection
 import com.hometemperature.network.iot.IotTransmission
 import com.hometemperature.util.itembuild.WifiItemBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.net.Socket
 
 /*
 app repository是整个app的数据中心，所有app的全局数据都暂存在这里。
 同时，该类负责处理多线程问题，比如数据库存取和网络请求。同时也是多线程任务的管理中心
  */
-class AppRepository(context: Context) {
-    //物联网模块的连接处理对象
-    private var iotConnection: IotConnection
-
-    //物联网模块的数据发送处理对象
-    private var iotTransmission: IotTransmission
+//物联网模块的连接处理对象
+//物联网模块的数据发送处理对象
+class AppRepository(
+    private val iotConnection: IotConnection,
+    private val iotTransmission: IotTransmission
+) {
 
     companion object {
         //volatile注释不允许缓存该变量
@@ -31,12 +30,16 @@ class AppRepository(context: Context) {
         private var INSTANCE: AppRepository? = null
 
         //App repository的实例化方法，采用单例模式，整个app只允许存在一个app repository实例（懒汉饿汉、线程安全）
-        fun getInstance(context: Context): AppRepository {
+        fun getInstance(
+            iotConnection: IotConnection,
+            iotTransmission: IotTransmission
+        ): AppRepository {
             synchronized(this) {
                 var instance = INSTANCE
 
                 if (instance == null) {
-                    instance = AppRepository(context)
+                    instance = AppRepository(iotConnection, iotTransmission)
+                    INSTANCE = instance
                 }
 
                 // 返回一个Repository实例
@@ -45,20 +48,6 @@ class AppRepository(context: Context) {
         }
     }
 
-    //TODO repository类初始化，即配置网络服务
-    init {
-        //创建网络连接服务
-        iotConnection =
-            context.let {
-                NetWorkServiceFactory().buildIotConnectionService(it)
-            }
-        //创建网络数据传输服务
-        iotTransmission =
-            context.let {
-                NetWorkServiceFactory().buildIotTransmissionService()
-            }
-
-    }
 
     //TODO 菜单中刷新按钮是否按下
     private val _refreshIsChecked = MutableLiveData<Boolean>().apply {
@@ -146,19 +135,15 @@ class AppRepository(context: Context) {
         _socket.postValue(value)
     }
 
-    //接收缓存
+    //更改接收缓存，提示收到数据了
     fun setDataReceiveCache(data: String) {
         _dataReceiveCache.postValue(data)
     }
 
-    //发送缓存
-    fun setDataSendCache(data: String) {
-        _dataSendCache.postValue(data)
-    }
-
-    //在数据中心的数据列表中添加
+    //在数据中心的数据列表中添加数据
     // 为了应对线程不同步问题，先从mdataList中添加元素，再将修改后的整个list传递给datalist
-    fun addDataItem(dataItem: DataItem) {
+    fun addDataItemToList(dataItem: DataItem) {
+        Timber.d("add data item to list")
         mdataList.add(dataItem)
         _dataList.postValue(mdataList)
     }
@@ -196,10 +181,11 @@ class AppRepository(context: Context) {
         notifyDataReceiving(repository)
     }
 
-    //向目标主机发送数据,发送数据方法：1.将数据存入repository send cache中 2.调用此方法
+    //向目标主机发送数据
     suspend fun sendData(repository: AppRepository) {
         withContext(Dispatchers.IO) {
             iotTransmission.onSendData(repository)
+            //发送数据方法：必须将数据存入repository send cache中
         }
     }
 }

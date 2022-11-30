@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.hometemperature.bean.item.WifiItem
 import com.hometemperature.database.AppRepository
+import com.hometemperature.network.NetWorkServiceFactory
 import kotlinx.coroutines.launch
 import java.net.Socket
 
@@ -14,7 +15,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     var usageCount: Int = 0
     var usageCount1: Int = 0
 
-    private val _repository: AppRepository = AppRepository.getInstance(application)
+    private val _repository: AppRepository = AppRepository.getInstance(
+        NetWorkServiceFactory().buildIotConnectionService(application),
+        NetWorkServiceFactory().buildIotTransmissionService()
+    )
     var repository: AppRepository = _repository
 
     //菜单中刷新按钮是否按下
