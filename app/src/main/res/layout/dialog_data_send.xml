@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+
+        <variable
+            name="item"
+            type="com.hometemperature.bean.item.DataItem" />
+    </data>
+
+    <!-- 收到的信息界面 -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_item_list"
+        android:padding="20sp">
+
+        <EditText
+            android:id="@+id/et_wifi_data"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="在这里输入你要发送的数据" />
+    </RelativeLayout>
+</layout>

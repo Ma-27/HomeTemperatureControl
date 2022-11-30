@@ -41,8 +41,12 @@ class DataCenterViewModel(private val application: Application) : ViewModel() {
 
     //将接收和发送的数据存入列表
     fun addDataToDataList(repository: AppRepository, dataItem: DataItem) {
-        repository.addDataItem(dataItem)
+        repository.addDataItemToList(dataItem)
     }
 
+    //修改发送缓存，相当于去直接发送数据
+    fun modifyReceiveCache(data: String) {
+        repository.setDataReceiveCache(data)
+    }
 
 }

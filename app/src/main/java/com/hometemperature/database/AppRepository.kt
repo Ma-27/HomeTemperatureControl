@@ -12,6 +12,7 @@ import com.hometemperature.network.iot.IotTransmission
 import com.hometemperature.util.itembuild.WifiItemBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.net.Socket
 
 /*
@@ -146,21 +147,19 @@ class AppRepository(context: Context) {
         _socket.postValue(value)
     }
 
-    //接收缓存
+    //更改接收缓存，提示收到数据了
     fun setDataReceiveCache(data: String) {
         _dataReceiveCache.postValue(data)
+        Timber.d("从网络模块收到数据" + data)
     }
 
-    //发送缓存
-    fun setDataSendCache(data: String) {
-        _dataSendCache.postValue(data)
-    }
-
-    //在数据中心的数据列表中添加
+    //在数据中心的数据列表中添加数据
     // 为了应对线程不同步问题，先从mdataList中添加元素，再将修改后的整个list传递给datalist
-    fun addDataItem(dataItem: DataItem) {
+    fun addDataItemToList(dataItem: DataItem) {
+        Timber.d("add data item to list")
         mdataList.add(dataItem)
         _dataList.postValue(mdataList)
+
     }
 
 
@@ -196,10 +195,11 @@ class AppRepository(context: Context) {
         notifyDataReceiving(repository)
     }
 
-    //向目标主机发送数据,发送数据方法：1.将数据存入repository send cache中 2.调用此方法
+    //向目标主机发送数据
     suspend fun sendData(repository: AppRepository) {
         withContext(Dispatchers.IO) {
             iotTransmission.onSendData(repository)
+            //发送数据方法：必须将数据存入repository send cache中
         }
     }
 }
