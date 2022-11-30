@@ -15,11 +15,16 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
-import com.google.android.material.snackbar.Snackbar
 import com.hometemperature.R
+import com.hometemperature.bean.flag.MessageType
+import com.hometemperature.bean.flag.TransmissionStatus
 import com.hometemperature.database.AppRepository
 import com.hometemperature.databinding.ActivityMainBinding
+import com.hometemperature.databinding.DialogDataSendBinding
+import com.hometemperature.network.NetWorkServiceFactory
+import com.hometemperature.util.itembuild.DataItemBuilder
 import timber.log.Timber
 
 
@@ -28,6 +33,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private lateinit var appRepository: AppRepository
+    private lateinit var dataSendBinding: DialogDataSendBinding
 
     private val REQUEST_ACCESS_NETWORK_STATE = 0
     private val REQUEST_INTERNET_STATE = 1
@@ -42,7 +48,10 @@ class MainActivity : AppCompatActivity() {
         //请求权限，处理权限问题
         permissionRequest()
         //初始化repository
-        appRepository = AppRepository.getInstance(this)
+        appRepository = AppRepository.getInstance(
+            NetWorkServiceFactory().buildIotConnectionService(application),
+            NetWorkServiceFactory().buildIotTransmissionService()
+        )
 
         //TODO 初始化视图布局
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -50,9 +59,9 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.appBarMain.toolbar)
 
+        //主界面fab按钮，fab按钮按下后，app发送数据到指定主机
         binding.appBarMain.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+            showDataSendingDetail()
         }
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
@@ -67,6 +76,37 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
+    }
+
+    private fun showDataSendingDetail() {
+        this.let {
+            //对话框视图绑定
+            dataSendBinding = DialogDataSendBinding.inflate(layoutInflater)
+            //构建对话框
+            MaterialAlertDialogBuilder(it)
+                .setTitle("发送数据到主机：")
+                //连接到这个wifi
+                .setPositiveButton("发送") { dialog, which ->
+                    //读取内容
+                    val data = dataSendBinding.etWifiData.text.toString()
+                    if (data.isNotEmpty()) {
+                        //构建数据对象
+                        val dataItem = DataItemBuilder.buildDataItem(data)
+                        dataItem.messageType = MessageType.MESSAGE_SEND
+                        dataItem.messageStatus = TransmissionStatus.UNKNOWN
+                        //调用接口发送数据
+                        appRepository.addDataItemToList(dataItem)
+                    } else {
+                        Timber.w("发送内容中无内容输入")
+                        Toast.makeText(this, "无内容输入", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                .setNegativeButton("取消") { dialog, which ->
+                    //取消
+                }
+                .setView(dataSendBinding.root)
+                .show()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
