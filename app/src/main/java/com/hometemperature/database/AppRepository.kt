@@ -138,6 +138,7 @@ class AppRepository(
     //更改接收缓存，提示收到数据了
     fun setDataReceiveCache(data: String) {
         _dataReceiveCache.postValue(data)
+        Timber.d("从网络模块收到数据" + data)
     }
 
     //在数据中心的数据列表中添加数据
@@ -146,6 +147,7 @@ class AppRepository(
         Timber.d("add data item to list")
         mdataList.add(dataItem)
         _dataList.postValue(mdataList)
+
     }
 
 
