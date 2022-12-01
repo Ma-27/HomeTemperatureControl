@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
@@ -23,11 +24,18 @@ import com.hometemperature.bean.flag.TransmissionStatus
 import com.hometemperature.database.AppRepository
 import com.hometemperature.databinding.ActivityMainBinding
 import com.hometemperature.databinding.DialogDataSendBinding
+import com.hometemperature.network.NetWorkServiceFactory
 import com.hometemperature.util.itembuild.DataItemBuilder
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 
 class MainActivity : AppCompatActivity() {
+    //部分live data变量更新次数统计，初始为0，每次使用+1(防止bug)
+    var usageCount: Int = 0
+    var usageCount1: Int = 0
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
@@ -41,13 +49,17 @@ class MainActivity : AppCompatActivity() {
     private val REQUEST_READ_PHONE_STATE = 4
     private val REQUEST_CHANGE_WIFI_STATE = 5
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         //请求权限，处理权限问题
         permissionRequest()
         //初始化repository
-        appRepository = AppRepository.getInstance(this)
+        appRepository = AppRepository.getInstance(
+            NetWorkServiceFactory().buildIotConnectionService(application),
+            NetWorkServiceFactory().buildIotTransmissionService()
+        )
 
         //TODO 初始化视图布局
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -59,6 +71,20 @@ class MainActivity : AppCompatActivity() {
         binding.appBarMain.fab.setOnClickListener { view ->
             showDataSendingDetail()
         }
+
+        appRepository.dataReceiveCache.observe(this, Observer {
+            if (usageCount1 != 0 && appRepository.wifiItem.value!!.isConnected == "已连接") {
+                GlobalScope.launch {
+                    appRepository.notifyDataReceiving(appRepository)
+                }
+            }
+            usageCount1++
+            if (usageCount1 > 9) {
+                usageCount1 = 1
+            }
+        })
+
+
         val drawerLayout: DrawerLayout = binding.drawerLayout
         val navView: NavigationView = binding.navView
         val navController = findNavController(R.id.nav_host_fragment_content_main)

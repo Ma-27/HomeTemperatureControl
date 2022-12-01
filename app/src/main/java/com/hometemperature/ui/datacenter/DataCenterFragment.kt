@@ -34,6 +34,7 @@ class DataCenterFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        Timber.d("切换到data center fragment")
         _binding = DataBindingUtil.inflate(inflater, R.layout.fragment_datacenter, container, false)
         dataCenterViewModel =
             ViewModelProvider(this, DataCenterViewModelFactory(requireActivity().application))
@@ -55,42 +56,48 @@ class DataCenterFragment : Fragment() {
             if (it != TestFlag.SEND) {
                 dataCenterViewModel.sendDataToHost(dataCenterViewModel.repository)
             }
+            //通知列表刷新数据
+            listAdapter.notifyDataSetChanged()
         })
 
         //监视接收缓存，一旦收到数据就将数据存入数据列表中
         dataCenterViewModel.dataReceiveCache.observe(viewLifecycleOwner, Observer {
-            Timber.d("目标cache收到更改  " + it)
+            Timber.d("receive cache" + it)
             //初始字符串就是 TestFlag.RECEIVE 如果相同说明未更新数据
             if (it != TestFlag.RECEIVE) {
                 //新建一个data item
                 val item = DataItemBuilder.buildDataItem(it)
                 item.messageType = MessageType.MESSAGE_RECEIVE
                 item.messageStatus = TransmissionStatus.SUCCESS
+                //将item添加到显示列表中去
                 dataCenterViewModel.addDataToDataList(dataCenterViewModel.repository, item)
-
-                Timber.d("目标cache收到更改（进入if  " + it)
-
             }
-
+            //通知列表刷新数据
+            listAdapter.notifyDataSetChanged()
         })
 
         //监视列表，如果发现列表改变就做变更,如果发生数据变更
         dataCenterViewModel.dataList.observe(viewLifecycleOwner, Observer {
+            Timber.d("data list 更改被触发")
             if (it.isNotEmpty()) {
                 //按照时间戳降序排列，这样第一个就是最新的一个
-                it.sortBy { dataItem -> dataItem.timestamp }
+                it.sortByDescending { dataItem -> dataItem.timestamp }
                 //选取最新更新的一个item，判断是不是更新的发出的数据
                 val dataItem = it[0]
-
-                Timber.d("从datalist中观察目标data item的第一个" + dataItem.data + "   " + dataItem.timestamp)
-
+                Timber.d(" 时间戳: " + dataItem.timestamp)
                 //如果是要发出的数据，修改view model中发送缓存
                 if (dataItem.messageType == MessageType.MESSAGE_SEND) {
                     dataCenterViewModel.modifyReceiveCache(dataItem.data)
                 }
+                //通知列表刷新数据
+                listAdapter.notifyDataSetChanged()
             }
         })
 
+        //重置刷新
+        binding.swDatacenter.setOnRefreshListener {
+            binding.swDatacenter.isRefreshing = false
+        }
     }
 
     private fun setupAdapter() {

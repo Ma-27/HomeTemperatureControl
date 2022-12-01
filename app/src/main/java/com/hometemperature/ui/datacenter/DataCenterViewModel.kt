@@ -6,10 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hometemperature.bean.item.DataItem
 import com.hometemperature.database.AppRepository
+import com.hometemperature.network.NetWorkServiceFactory
 import kotlinx.coroutines.launch
 
 class DataCenterViewModel(private val application: Application) : ViewModel() {
-    private val _repository: AppRepository = AppRepository.getInstance(application)
+    private val _repository: AppRepository = AppRepository.getInstance(
+        NetWorkServiceFactory().buildIotConnectionService(application),
+        NetWorkServiceFactory().buildIotTransmissionService()
+    )
     var repository: AppRepository = _repository
 
     //检查网络状态，暂存网络状态
