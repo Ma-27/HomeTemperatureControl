@@ -64,7 +64,7 @@ class HomeFragment : Fragment() {
         homeViewModel.disConnectWifi(homeViewModel.repository)
     }
 
-    //创建各个控件的点击响应监听
+    //创建各个控件的点击响应监听和变量状态改变监听
     private fun setListener(container: ViewGroup?) {
         //上拉刷新控件的响应
         binding.swContainer.setOnRefreshListener {
@@ -101,18 +101,6 @@ class HomeFragment : Fragment() {
             homeViewModel.usageCount++
             if (homeViewModel.usageCount > 9) {
                 homeViewModel.usageCount = 1
-            }
-        })
-
-        //在收到新数据后重置一个接收线程，使得app一直处于接收数据状态
-        //FIXME 粗浅的修补了bug：切换时防止为空集合
-        homeViewModel.repository.dataReceiveCache.observe(viewLifecycleOwner, Observer {
-            if (homeViewModel.usageCount1 != 0 && homeViewModel.repository.wifiItem.value!!.isConnected == "已连接") {
-                homeViewModel.notifyDataReceiving(homeViewModel.repository)
-            }
-            homeViewModel.usageCount1++
-            if (homeViewModel.usageCount1 > 9) {
-                homeViewModel.usageCount1 = 1
             }
         })
     }

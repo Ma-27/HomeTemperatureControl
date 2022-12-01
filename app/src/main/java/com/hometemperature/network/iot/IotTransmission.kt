@@ -7,5 +7,5 @@ import com.hometemperature.network.NetWorkService
 interface IotTransmission : NetWorkService {
     suspend fun onReceiveData(repository: AppRepository)
 
-    suspend fun onSendData(repository: AppRepository)
+    suspend fun onSendData(repository: AppRepository): Int
 }

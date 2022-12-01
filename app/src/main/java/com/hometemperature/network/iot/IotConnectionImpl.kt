@@ -8,6 +8,7 @@ import android.net.*
 import android.net.wifi.WifiManager
 import android.net.wifi.WifiNetworkSpecifier
 import android.os.PatternMatcher
+import com.hometemperature.HomeTemperatureApplication
 import com.hometemperature.R
 import com.hometemperature.bean.item.WifiItem
 import com.hometemperature.database.AppRepository
@@ -15,11 +16,12 @@ import com.hometemperature.util.DataTransferObject
 import timber.log.Timber
 import java.net.SocketException
 
-class IotConnectionImpl(private val context: Context) : IotConnection {
+class IotConnectionImpl(
+    private val wifiManager: WifiManager,
+    private val connectivityManager: ConnectivityManager
+) : IotConnection {
     //初始化读取网络状态
-    private val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
-    private val connectivityManager =
-        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val context = HomeTemperatureApplication.getContext()
 
     //后台刷新wifi列表
     override fun checkNetworkState(repository: AppRepository) {
