@@ -30,7 +30,7 @@ fun commitDataCenterList(listView: RecyclerView, items: MutableList<DataItem>?) 
 
 //TODO
 //flag 0 imply the view is a receiver view,flag 1 imply the view is a sender view;flag can only be passed by 0 or 1.
-@BindingAdapter("app:messagetype", "app:flag")
+@BindingAdapter("messagetype", "flag")
 fun itemVisibility(view: RelativeLayout, messageType: Int, flag: Int) {
     var visibility = View.VISIBLE
     //when flag is 0 and the message is a received message,then set the view visible

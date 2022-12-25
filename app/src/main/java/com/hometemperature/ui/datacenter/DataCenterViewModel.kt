@@ -2,12 +2,14 @@ package com.hometemperature.ui.datacenter
 
 import android.app.Application
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hometemperature.bean.item.DataItem
 import com.hometemperature.database.AppRepository
 import com.hometemperature.network.NetWorkServiceFactory
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class DataCenterViewModel(private val application: Application) : ViewModel() {
     private val _repository: AppRepository = AppRepository.getInstance(
@@ -31,13 +33,19 @@ class DataCenterViewModel(private val application: Application) : ViewModel() {
     val dataSendCache: LiveData<String>
         get() = _dataSendCache
 
+    //最新一个item的的时间戳，用来防止重复发送数据
+    private val _latestItemTimestamp = MutableLiveData<Long>().apply {
+        value = 0
+    }
+    val latestItemTimestamp: LiveData<Long>
+        get() = _latestItemTimestamp
+
     //发送和接受数据的列表
     private val _dataList = repository.dataList
     var dataList: LiveData<MutableList<DataItem>> = _dataList
 
     //发送数据到已连接的主机。注意：该方法为网络方法，要在网络进程中处理
     fun sendDataToHost(repository: AppRepository) {
-        //发起携程，从IO线程处理
         viewModelScope.launch {
             repository.sendData(repository)
         }
@@ -49,8 +57,21 @@ class DataCenterViewModel(private val application: Application) : ViewModel() {
     }
 
     //修改发送缓存，相当于去直接发送数据
-    fun modifyReceiveCache(data: String) {
-        repository.setDataReceiveCache(data)
+    fun modifySendCache(data: String) {
+        repository.setDataSendCache(data)
     }
 
+    //修改发送时间，避免重新发起数据发送请求
+    fun modifyLatestTimestamp(time: Long) {
+        _latestItemTimestamp.postValue(time)
+        Timber.e("修改发送时间" + time)
+    }
+
+    //获取以秒做单位的时间戳
+    private fun getTime(): Int {
+        val timeStamp = System.currentTimeMillis()
+        val timeStampSec = (timeStamp / 1000).toInt()
+        Timber.d("时间戳$timeStampSec")
+        return timeStampSec
+    }
 }

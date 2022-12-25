@@ -26,11 +26,6 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     val refreshIsChecked: LiveData<Boolean>
         get() = _refreshIsChecked
 
-    //检查网络状态，暂存网络状态
-    private val _networkStatus = _repository.networkStatus
-    val networkStatus: LiveData<String>
-        get() = _networkStatus
-
     //菜单中显示的wifi列表
     private val _wifiList = _repository.wifiList
     var wifiList: LiveData<List<WifiItem>> = _wifiList

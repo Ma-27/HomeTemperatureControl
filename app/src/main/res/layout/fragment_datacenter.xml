@@ -17,7 +17,7 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_data_list"
-            setDataCenterList="@{viewmodel.dataList}"
+            app:setDataCenterList="@{viewmodel.dataList}"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
