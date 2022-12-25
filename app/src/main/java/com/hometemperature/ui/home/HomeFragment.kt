@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import com.hometemperature.R
 import com.hometemperature.bean.flag.NetWorkDefaultConfiguration
 import com.hometemperature.bean.item.WifiItem
@@ -82,15 +81,6 @@ class HomeFragment : Fragment() {
             }
         })
 
-        //刷新状态更新的snackBar提示
-        //FIXME 未知bug，如果传入binding.viewModel则会报错，明明两者持有相同的引用
-        homeViewModel.networkStatus.observe(viewLifecycleOwner, Observer {
-            if (container != null) {
-                homeViewModel.networkStatus.value?.let { it ->
-                    Snackbar.make(container, it, Snackbar.LENGTH_SHORT).show()
-                }
-            }
-        })
 
         //socket发生改变时通知repository刷新socket
         //FIXME 粗浅的修补了bug：切换时防止为空集合

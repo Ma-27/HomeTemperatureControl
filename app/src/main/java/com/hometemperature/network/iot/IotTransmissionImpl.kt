@@ -46,13 +46,13 @@ class IotTransmissionImpl : IotTransmission {
 
     //当发送数据时，在此处理。FIXME 此处可能有socket空异常
     override suspend fun onSendData(repository: AppRepository): Int {
+        dataOut = repository.dataSendCache.toString()
         //检查连接状态，如果没有连接就发送数据，则退出函数
         if (repository.wifiItem.value!!.isConnected != "已连接") {
-            Timber.e("未连接到wifi就尝试发送数据")
+            Timber.e("未连接到wifi就尝试发送数据$dataOut")
             return TransmissionStatus.FAIL
         }
 
-        dataOut = repository.dataSendCache.toString()
         val socket = repository.socket.value
         // 获取输出流.
         val outputStream: OutputStream = withContext(Dispatchers.IO) {

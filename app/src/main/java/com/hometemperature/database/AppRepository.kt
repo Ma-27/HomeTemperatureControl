@@ -3,6 +3,7 @@ package com.hometemperature.database
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.hometemperature.bean.flag.TestFlag
+import com.hometemperature.bean.flag.TransmissionStatus
 import com.hometemperature.bean.item.DataItem
 import com.hometemperature.bean.item.WifiItem
 import com.hometemperature.network.iot.IotConnection
@@ -93,6 +94,7 @@ class AppRepository(
 
     //TODO 要接收的数据缓存（相比起数据列表更容易access）
     private val _dataReceiveCache = MutableLiveData<String>().apply {
+        //默认值为TestFlag.RECEIVE
         value = TestFlag.RECEIVE
     }
     val dataReceiveCache: LiveData<String>
@@ -100,6 +102,7 @@ class AppRepository(
 
     //TODO 要发送的数据缓存（相比起数据列表更容易access）
     private val _dataSendCache = MutableLiveData<String>().apply {
+        //默认值为TestFlag.SEND
         value = TestFlag.SEND
     }
     val dataSendCache: LiveData<String>
@@ -138,16 +141,20 @@ class AppRepository(
     //更改接收缓存，提示收到数据了
     fun setDataReceiveCache(data: String) {
         _dataReceiveCache.postValue(data)
-        Timber.d("从网络模块收到数据" + data)
+        Timber.d("接收缓存收到数据$data")
+    }
+
+    //更改发送缓存，发送缓存收到更改后，应安排发送数据
+    fun setDataSendCache(data: String) {
+        _dataSendCache.postValue(data)
+        Timber.d("发送缓存收到数据$data")
     }
 
     //在数据中心的数据列表中添加数据
     // 为了应对线程不同步问题，先从mdataList中添加元素，再将修改后的整个list传递给datalist
     fun addDataItemToList(dataItem: DataItem) {
-        Timber.d("add data item to list")
         mdataList.add(dataItem)
         _dataList.postValue(mdataList)
-
     }
 
 
@@ -186,8 +193,20 @@ class AppRepository(
     //向目标主机发送数据
     suspend fun sendData(repository: AppRepository) {
         withContext(Dispatchers.IO) {
-            iotTransmission.onSendData(repository)
-            //发送数据方法：必须将数据存入repository send cache中
+            //发送数据方法：必须将数据存入repository send cache中,并返回发送结果到network status
+            var status = TransmissionStatus.UNKNOWN
+            //发送数据
+            status = iotTransmission.onSendData(repository)
+            //报告发送状态
+            setNetWorkStatus(
+                when (status) {
+                    TransmissionStatus.SUCCESS -> "发送成功"
+                    TransmissionStatus.FAIL -> "发送失败，可能是网络未连接"
+                    else -> {
+                        ""
+                    }
+                }
+            )
         }
     }
 }

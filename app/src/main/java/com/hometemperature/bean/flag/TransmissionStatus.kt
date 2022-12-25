@@ -6,6 +6,8 @@ class TransmissionStatus {
 
         const val FAIL = 1
 
-        const val UNKNOWN = 1
+        const val UNKNOWN = 2
+
+        const val ON_SENDING = 3
     }
 }

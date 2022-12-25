@@ -18,6 +18,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 import com.hometemperature.R
 import com.hometemperature.bean.flag.MessageType
 import com.hometemperature.bean.flag.TransmissionStatus
@@ -67,22 +68,7 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.appBarMain.toolbar)
 
-        //主界面fab按钮，fab按钮按下后，app发送数据到指定主机
-        binding.appBarMain.fab.setOnClickListener { view ->
-            showDataSendingDetail()
-        }
-
-        appRepository.dataReceiveCache.observe(this, Observer {
-            if (usageCount1 != 0 && appRepository.wifiItem.value!!.isConnected == "已连接") {
-                GlobalScope.launch {
-                    appRepository.notifyDataReceiving(appRepository)
-                }
-            }
-            usageCount1++
-            if (usageCount1 > 9) {
-                usageCount1 = 1
-            }
-        })
+        setListener()
 
 
         val drawerLayout: DrawerLayout = binding.drawerLayout
@@ -100,6 +86,37 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    //设置点击事件和live data的监听
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun setListener() {
+        //主界面fab按钮，fab按钮按下后，app发送数据到指定主机
+        binding.appBarMain.fab.setOnClickListener { view ->
+            showDataSendingDetail()
+        }
+
+        //一旦收到数据，再启动一个接收函数，负责下一次的数据接收。
+        appRepository.dataReceiveCache.observe(this, Observer {
+            if (usageCount1 != 0 && appRepository.wifiItem.value!!.isConnected == "已连接") {
+                GlobalScope.launch {
+                    appRepository.notifyDataReceiving(appRepository)
+                }
+            }
+            usageCount1++
+            if (usageCount1 > 9) {
+                usageCount1 = 1
+            }
+        })
+
+        //刷新状态更新的snackBar提示
+        //FIXME 未知bug，如果传入binding.viewModel则会报错，明明两者持有相同的引用
+        appRepository.networkStatus.observe(this, Observer {
+            appRepository.networkStatus.value?.let { it ->
+                Snackbar.make(binding.root, it, Snackbar.LENGTH_SHORT).show()
+            }
+        })
+    }
+
+    //点击+号fab，发送数据的界面
     private fun showDataSendingDetail() {
         this.let {
             //对话框视图绑定
@@ -116,7 +133,7 @@ class MainActivity : AppCompatActivity() {
                         val dataItem = DataItemBuilder.buildDataItem(data)
                         dataItem.messageType = MessageType.MESSAGE_SEND
                         dataItem.messageStatus = TransmissionStatus.UNKNOWN
-                        //调用接口发送数据
+                        //存入发送缓存中，发送数据
                         appRepository.addDataItemToList(dataItem)
                     } else {
                         Timber.w("发送内容中无内容输入")
