@@ -193,15 +193,15 @@ class AppRepository(
     //向目标主机发送数据
     suspend fun sendData(repository: AppRepository) {
         withContext(Dispatchers.IO) {
-            //发送数据方法：必须将数据存入repository send cache中,并返回发送结果到network status
-            var status = TransmissionStatus.UNKNOWN
             //发送数据
-            status = iotTransmission.onSendData(repository)
+            val status = iotTransmission.onSendData(repository)
             //报告发送状态
             setNetWorkStatus(
                 when (status) {
                     TransmissionStatus.SUCCESS -> "发送成功"
-                    TransmissionStatus.FAIL -> "发送失败，可能是网络未连接"
+                    TransmissionStatus.FAIL -> "发送失败"
+                    TransmissionStatus.SOCKET_NULL -> "端口为空"
+                    TransmissionStatus.UNCONNECTED -> "网络未连接，请连接网络时再试"
                     else -> {
                         ""
                     }
