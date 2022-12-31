@@ -10,6 +10,7 @@ import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.OutputStream
 import java.net.SocketException
+import java.nio.charset.Charset
 
 class IotTransmissionImpl : IotTransmission {
     lateinit var dataIn: String
@@ -59,7 +60,7 @@ class IotTransmissionImpl : IotTransmission {
 
     //当发送数据时，在此处理。FIXME 此处可能有socket空异常
     override suspend fun onSendData(repository: AppRepository): Int {
-        dataOut = repository.dataSendCache.toString()
+        dataOut = repository.dataSendCache.value.toString()
         //检查连接状态，如果没有连接就发送数据，则退出函数
         if (repository.wifiItem.value!!.isConnected != "已连接" || repository.socket.value == null) {
             if (repository.wifiItem.value!!.isConnected != "已连接") {
@@ -84,7 +85,7 @@ class IotTransmissionImpl : IotTransmission {
                 //清除缓存区
                 outputStream.flush()
                 //关闭连接
-                outputStream.close()
+                //outputStream.close()
             }
             Timber.d("onStartConnection成功发送的数据如下：${dataOut.toByteArray()}")
         } catch (e1: SocketException) {

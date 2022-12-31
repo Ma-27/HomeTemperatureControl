@@ -64,7 +64,7 @@ class DataCenterViewModel(private val application: Application) : ViewModel() {
     //修改发送时间，避免重新发起数据发送请求
     fun modifyLatestTimestamp(time: Long) {
         _latestItemTimestamp.postValue(time)
-        Timber.e("修改发送时间" + time)
+        Timber.d("修改发送时间$time")
     }
 
     //获取以秒做单位的时间戳

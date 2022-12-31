@@ -113,6 +113,7 @@ class DataCenterFragment : Fragment() {
                 ) {
                     //修改时间为两者一样，防止下次重复添加，重复执行命令
                     dataCenterViewModel.modifyLatestTimestamp(dataItem.timestamp)
+                    Timber.d("接收到新数据")
                     //TODO 解码，翻译命令
 
                 }
