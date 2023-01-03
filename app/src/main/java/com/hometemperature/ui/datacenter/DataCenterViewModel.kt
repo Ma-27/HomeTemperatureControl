@@ -1,17 +1,14 @@
 package com.hometemperature.ui.datacenter
 
 import android.app.Application
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.hometemperature.bean.item.DataItem
 import com.hometemperature.database.AppRepository
 import com.hometemperature.network.NetWorkServiceFactory
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class DataCenterViewModel(private val application: Application) : ViewModel() {
+class DataCenterViewModel(application: Application) : AndroidViewModel(application) {
     private val _repository: AppRepository = AppRepository.getInstance(
         NetWorkServiceFactory().buildIotConnectionService(application),
         NetWorkServiceFactory().buildIotTransmissionService()

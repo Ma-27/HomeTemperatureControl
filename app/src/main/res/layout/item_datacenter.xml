@@ -55,6 +55,7 @@
                     android:layout_marginEnd="48sp"
                     android:background="@drawable/bg_chat_you">
 
+
                     <TextView
                         android:id="@+id/tv_receiver_event"
                         style="@style/h2"
@@ -63,7 +64,6 @@
                         android:layout_marginStart="15dp"
                         android:textAppearance="@style/CardView.Light"
                         tools:text="@{item.event}" />
-
 
                     <TextView
                         android:id="@+id/tv_receiver_data"
@@ -88,7 +88,10 @@
                         android:textAppearance="@style/CardView.Light"
                         android:textColor="@color/colorTextBlack"
                         android:textSize="@dimen/h4" />
+
+
                 </RelativeLayout>
+
             </LinearLayout>
         </RelativeLayout>
 
@@ -133,6 +136,8 @@
                     android:layout_alignParentEnd="true"
                     android:layout_marginEnd="15dp"
                     android:textAppearance="@style/CardView.Light"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
                     tools:text="@{item.event}" />
 
                 <TextView
@@ -145,21 +150,9 @@
                     android:layout_marginEnd="15dp"
                     android:textAppearance="@style/CardView.Light"
                     android:textColor="@color/colorTextInfo"
-                    android:textSize="@dimen/h1"
+                    android:textSize="@dimen/space15"
                     tools:text="@{item.data}" />
 
-                <TextView
-                    android:id="@+id/tv_sender_time"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignTop="@id/tv_sender_event"
-                    android:layout_alignParentStart="true"
-                    android:layout_marginStart="15dp"
-                    android:layout_marginTop="3dp"
-                    android:text="5:04pm"
-                    android:textAppearance="@style/CardView.Light"
-                    android:textColor="@color/colorTextBlack"
-                    android:textSize="@dimen/h4" />
             </RelativeLayout>
 
         </RelativeLayout>

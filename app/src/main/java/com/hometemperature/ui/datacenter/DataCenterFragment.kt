@@ -42,13 +42,13 @@ class DataCenterFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
 
         setupAdapter()
-        setListener(container)
+        setListener()
 
         return binding.root
     }
 
     //创建各个控件的点击响应监听和变量状态改变监听
-    private fun setListener(container: ViewGroup?) {
+    private fun setListener() {
         //监视发送缓存，发送数据就是把待发数据存入发送缓存中，一旦缓存变更就发送
         dataCenterViewModel.dataSendCache.observe(viewLifecycleOwner, Observer {
             //防止空列表
