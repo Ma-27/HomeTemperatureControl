@@ -47,18 +47,21 @@ class ConsoleFragment : Fragment() {
         binding.switchTemperature.setOnCheckedChangeListener { compoundButton, b ->
             if (b) {
                 //打开后从这里处理
+                consoleViewModel.sendData("L")
                 consoleViewModel.setNetWorkStatus("温度控制系统已开启")
             } else {
+                consoleViewModel.sendData("S")
                 consoleViewModel.setNetWorkStatus("温度控制系统已关闭")
             }
+            consoleViewModel.acSwitchStatus(b)
         }
 
         //
         binding.sbTemperature.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
-            var temperature: Float = 15.0f
+            var temperature: Int = 15
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 // Called when the progress value is changed
-                temperature = 15.0f + (progress / 100.0f) * 15.0f
+                temperature = 15 + (progress * 15) / 100
 
                 consoleViewModel.setTargetTemperature(temperature)
             }
@@ -69,9 +72,9 @@ class ConsoleFragment : Fragment() {
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {
                 // Called when the user stops touching the seekbar
-                //向主机发送温度数据
-
-
+                //向主机发送温度数据,只保留温度到整数
+                consoleViewModel.targetTemperature.value?.toString()
+                    ?.let { consoleViewModel.sendData(it) }
             }
         })
 

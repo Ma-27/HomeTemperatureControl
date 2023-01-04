@@ -97,8 +97,10 @@ class MainActivity : AppCompatActivity() {
                 val item = DataItemBuilder.buildDataItem(it)
                 item.messageType = MessageType.MESSAGE_RECEIVE
                 item.messageStatus = TransmissionStatus.SUCCESS
+                //提示收到数据
+                item.event = DataItemBuilder.determineEventString("1", MessageType.MESSAGE_RECEIVE)
                 //将item添加到显示列表中去
-                viewModel.addDataToDataList(viewModel.repository, item)
+                viewModel.addDataToDataList(item)
             }
 
             //一旦收到数据，再启动一个接收函数，负责下一次的数据接收。
@@ -129,7 +131,7 @@ class MainActivity : AppCompatActivity() {
                     (dataItem.timestamp != viewModel.latestItemTimestamp.value || viewModel.latestItemTimestamp.value == 0L)
                 ) {
                     //正式调用网络模块发送数据
-                    viewModel.sendDataToHost(viewModel.repository)
+                    viewModel.sendDataToHost()
                     //重置timestamp标志，用来做前一个的发送标志
                     dataItem.timestamp.let { it1 ->
                         viewModel.modifyLatestTimestamp(
@@ -164,7 +166,8 @@ class MainActivity : AppCompatActivity() {
                     viewModel.modifyLatestTimestamp(dataItem.timestamp)
                     Timber.d("接收到新数据")
                     //TODO 解码，翻译命令
-
+                    //FIXME 由于接收到的即为温度，则直接将内容提取出来并且转换就行了
+                    viewModel.modifyCurrentTemperature(DataItemBuilder.formatTemperature(dataItem.data))
                 }
             }
         })
@@ -194,12 +197,8 @@ class MainActivity : AppCompatActivity() {
                     //读取内容
                     val data = dataSendBinding.etWifiData.text.toString()
                     if (data.isNotEmpty()) {
-                        //构建数据对象
-                        val dataItem = DataItemBuilder.buildDataItem(data)
-                        dataItem.messageType = MessageType.MESSAGE_SEND
-                        dataItem.messageStatus = TransmissionStatus.UNKNOWN
-                        //存入发送缓存中，发送数据
-                        viewModel.repository.addDataItemToList(dataItem)
+                        //向主机发送数据
+                        viewModel.sendData(data)
                     } else {
                         Timber.w("发送内容中无内容输入")
                         Toast.makeText(this, "无内容输入", Toast.LENGTH_SHORT).show()

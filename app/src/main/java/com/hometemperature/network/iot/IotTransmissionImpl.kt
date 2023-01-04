@@ -10,7 +10,6 @@ import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.OutputStream
 import java.net.SocketException
-import java.nio.charset.Charset
 
 class IotTransmissionImpl : IotTransmission {
     lateinit var dataIn: String
@@ -64,7 +63,7 @@ class IotTransmissionImpl : IotTransmission {
         //检查连接状态，如果没有连接就发送数据，则退出函数
         if (repository.wifiItem.value!!.isConnected != "已连接" || repository.socket.value == null) {
             if (repository.wifiItem.value!!.isConnected != "已连接") {
-                Timber.e("未连接到wifi就尝试发送数据${dataOut.toByteArray()}")
+                Timber.e("未连接到wifi就尝试发送数据${dataOut}")
                 return TransmissionStatus.UNCONNECTED
             }
             if (repository.socket.value == null) {
