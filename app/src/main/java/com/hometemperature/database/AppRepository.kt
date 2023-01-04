@@ -11,7 +11,6 @@ import com.hometemperature.network.iot.IotTransmission
 import com.hometemperature.util.itembuild.WifiItemBuilder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import java.net.Socket
 
 /*
@@ -108,6 +107,13 @@ class AppRepository(
     val dataSendCache: LiveData<String>
         get() = _dataSendCache
 
+    //TODO 缓存温度调节的当前温度
+    private val _currentTemperature = MutableLiveData<Float>().apply {
+        value = 13.8f
+    }
+    val currentTemperature: LiveData<Float>
+        get() = _currentTemperature
+
     /**
      * 各自字段的setter方法
      */
@@ -138,16 +144,21 @@ class AppRepository(
         _socket.postValue(value)
     }
 
+    //收到新的温度数据后，设置室温
+    fun setCurrentTemperature(temperature: Float) {
+        _currentTemperature.postValue(temperature)
+    }
+
     //更改接收缓存，提示收到数据了
     fun setDataReceiveCache(data: String) {
         _dataReceiveCache.postValue(data)
-        Timber.d("接收缓存收到数据$data")
+        //Timber.d("接收缓存收到数据$data")
     }
 
     //更改发送缓存，发送缓存收到更改后，应安排发送数据
     fun setDataSendCache(data: String) {
         _dataSendCache.postValue(data)
-        Timber.d("发送缓存收到数据$data")
+        //Timber.d("发送缓存收到数据$data")
     }
 
     //在数据中心的数据列表中添加数据
@@ -193,15 +204,15 @@ class AppRepository(
     //向目标主机发送数据
     suspend fun sendData(repository: AppRepository) {
         withContext(Dispatchers.IO) {
-            //发送数据方法：必须将数据存入repository send cache中,并返回发送结果到network status
-            var status = TransmissionStatus.UNKNOWN
             //发送数据
-            status = iotTransmission.onSendData(repository)
+            val status = iotTransmission.onSendData(repository)
             //报告发送状态
             setNetWorkStatus(
                 when (status) {
                     TransmissionStatus.SUCCESS -> "发送成功"
-                    TransmissionStatus.FAIL -> "发送失败，可能是网络未连接"
+                    TransmissionStatus.FAIL -> "发送失败"
+                    TransmissionStatus.SOCKET_NULL -> "端口为空"
+                    TransmissionStatus.UNCONNECTED -> "网络未连接，请连接网络时再试"
                     else -> {
                         ""
                     }

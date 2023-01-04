@@ -1,17 +1,15 @@
 package com.hometemperature.ui.datacenter
 
 import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.hometemperature.bean.item.DataItem
 import com.hometemperature.database.AppRepository
 import com.hometemperature.network.NetWorkServiceFactory
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class DataCenterViewModel(private val application: Application) : ViewModel() {
+class DataCenterViewModel(application: Application) : AndroidViewModel(application) {
     private val _repository: AppRepository = AppRepository.getInstance(
         NetWorkServiceFactory().buildIotConnectionService(application),
         NetWorkServiceFactory().buildIotTransmissionService()
@@ -43,29 +41,6 @@ class DataCenterViewModel(private val application: Application) : ViewModel() {
     //发送和接受数据的列表
     private val _dataList = repository.dataList
     var dataList: LiveData<MutableList<DataItem>> = _dataList
-
-    //发送数据到已连接的主机。注意：该方法为网络方法，要在网络进程中处理
-    fun sendDataToHost(repository: AppRepository) {
-        viewModelScope.launch {
-            repository.sendData(repository)
-        }
-    }
-
-    //将接收和发送的数据存入列表
-    fun addDataToDataList(repository: AppRepository, dataItem: DataItem) {
-        repository.addDataItemToList(dataItem)
-    }
-
-    //修改发送缓存，相当于去直接发送数据
-    fun modifySendCache(data: String) {
-        repository.setDataSendCache(data)
-    }
-
-    //修改发送时间，避免重新发起数据发送请求
-    fun modifyLatestTimestamp(time: Long) {
-        _latestItemTimestamp.postValue(time)
-        Timber.e("修改发送时间" + time)
-    }
 
     //获取以秒做单位的时间戳
     private fun getTime(): Int {
