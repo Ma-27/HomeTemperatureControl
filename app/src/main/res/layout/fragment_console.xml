@@ -254,52 +254,59 @@
                         android:id="@+id/tv_temperature_home"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginStart="8dp"
-                        android:layout_marginBottom="16dp"
                         android:fontFamily="serif"
                         android:padding="2dp"
                         android:text="18°C"
                         android:textAlignment="center"
                         android:textColor="@color/white"
                         android:textSize="18sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="@+id/iv_temperature_photo"
                         app:layout_constraintStart_toStartOf="@+id/iv_temperature_photo"
-                        app:layout_constraintTop_toBottomOf="@+id/tv_undefined2"
-                        app:layout_constraintVertical_bias="0.133" />
+                        app:layout_constraintTop_toBottomOf="@+id/tv_undefined2" />
 
                     <TextView
                         android:id="@+id/tv_undefined3"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="16dp"
                         android:fontFamily="serif"
                         android:padding="2dp"
                         android:text="设定温度"
                         android:textAlignment="center"
                         android:textColor="@color/white"
                         android:textSize="18sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintBottom_toTopOf="@+id/tv_temperature_setting"
                         app:layout_constraintEnd_toEndOf="@+id/iv_temperature_photo"
                         app:layout_constraintStart_toStartOf="@+id/iv_temperature_photo"
-                        app:layout_constraintTop_toBottomOf="@+id/tv_temperature_home"
-                        app:layout_constraintVertical_bias="0.133" />
+                        app:layout_constraintTop_toBottomOf="@+id/tv_temperature_home" />
 
                     <TextView
                         android:id="@+id/tv_temperature_setting"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
                         android:fontFamily="serif"
                         android:padding="2dp"
-                        android:text="25°C"
+                        android:text="@{viewmodel.targetTemperature.toString()}"
                         android:textAlignment="center"
                         android:textColor="@color/white"
                         android:textSize="18sp"
-                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="@+id/iv_temperature_photo"
                         app:layout_constraintStart_toStartOf="@+id/iv_temperature_photo"
                         app:layout_constraintTop_toBottomOf="@+id/tv_undefined3" />
+
+                    <Switch
+                        android:id="@+id/switch_temperature"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:fontFamily="serif"
+                        android:padding="2dp"
+                        android:textAlignment="center"
+                        android:textSize="18sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/tv_temperature_setting"
+                        tools:ignore="UseSwitchCompatOrMaterialXml" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.cardview.widget.CardView>
