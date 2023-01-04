@@ -8,6 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DividerItemDecoration
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.hometemperature.R
 import com.hometemperature.bean.flag.NetWorkDefaultConfiguration
@@ -104,6 +105,14 @@ class HomeFragment : Fragment() {
                 showWifiItemDetail(item)
                 Timber.d("成功点击$item")
             })
+            //为wifi列表中每个item添加divider分割线
+            val dividerItemDecoration = binding.rvWifiList.layoutManager?.let {
+                DividerItemDecoration(
+                    binding.rvWifiList.context,
+                    DividerItemDecoration.VERTICAL
+                )
+            }
+            dividerItemDecoration?.let { binding.rvWifiList.addItemDecoration(it) }
 
             binding.rvWifiList.adapter = listAdapter
         } else {
