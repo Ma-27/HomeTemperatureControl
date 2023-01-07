@@ -14,55 +14,47 @@
             type="com.hometemperature.ui.home.WifiListClickListener" />
     </data>
 
-    <androidx.cardview.widget.CardView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/space5"
-        app:cardElevation="@dimen/space5">
+        android:onClick="@{() -> clickListener.onClick(wifiitem)}">
 
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:onClick="@{() -> clickListener.onClick(wifiitem)}">
+        <ImageView
+            android:id="@+id/iv_wifi_icon"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:src="@drawable/ic_wifi_no_strength"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+            android:id="@+id/tv_wifi_name"
+            android:layout_width="0dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/iv_wifi_icon"
+            app:layout_constraintTop_toTopOf="@+id/iv_wifi_icon"
+            tools:text="@{wifiitem.wifiName}" />
 
-            <ImageView
-                android:id="@+id/iv_wifi_icon"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:src="@drawable/ic_wifi_no_strength"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/tv_wifi_name"
-                android:layout_width="0dp"
-                android:layout_height="20dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/iv_wifi_icon"
-                app:layout_constraintTop_toTopOf="@+id/iv_wifi_icon"
-                tools:text="@{wifiitem.wifiName}" />
-
-            <TextView
-                android:id="@+id/tv_wifi_status"
-                android:layout_width="0dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="8dp"
-                app:layout_constraintEnd_toEndOf="@+id/tv_wifi_name"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@+id/tv_wifi_name"
-                app:layout_constraintTop_toBottomOf="@+id/tv_wifi_name"
-                tools:text="@{String.valueOf(wifiitem.isConnected)}" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </androidx.cardview.widget.CardView>
+        <TextView
+            android:id="@+id/tv_wifi_status"
+            android:layout_width="0dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="@+id/tv_wifi_name"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="@+id/tv_wifi_name"
+            app:layout_constraintTop_toBottomOf="@+id/tv_wifi_name"
+            tools:text="@{String.valueOf(wifiitem.isConnected)}" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

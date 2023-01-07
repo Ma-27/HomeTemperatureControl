@@ -16,5 +16,5 @@ data class WifiItem(
 ) {
     //接入点name为wifi名称，为ssid
     //接入点mac地址，变量名apMacAddress，为bssid
-    //FIXME ，这里的设备mac地址写死了，实际情况下待wifi进行分配
+    //XXX 这里的设备mac地址写死了，实际情况下待wifi进行分配
 }

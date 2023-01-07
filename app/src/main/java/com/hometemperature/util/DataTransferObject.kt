@@ -8,7 +8,7 @@ import com.hometemperature.bean.item.WifiItem
 class DataTransferObject {
     companion object {
         //使用map映射将每个对象转化为另一个对象
-        //FIXME ，这里的设备mac地址写死了，实际情况下待wifi进行分配
+        //XXX 这里的设备mac地址写死了，实际情况下待wifi进行分配
         fun asWifiItem(scanResult: List<ScanResult>): List<WifiItem> {
             return scanResult.map {
                 WifiItem(

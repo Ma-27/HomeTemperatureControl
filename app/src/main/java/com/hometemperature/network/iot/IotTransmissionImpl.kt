@@ -50,7 +50,7 @@ class IotTransmissionImpl : IotTransmission {
             repository.setNetWorkStatus("接收数据时出现exception")
             e.printStackTrace()
         } finally {
-            //FIXME 关闭输入流并退出
+            //TODO 关闭输入流并退出
         }
 
         Timber.d("onStartConnection成功接收到的数据如下：$dataIn")

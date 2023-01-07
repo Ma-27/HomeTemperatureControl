@@ -43,20 +43,33 @@ class ConsoleFragment : Fragment() {
 
     //创建各个控件的点击响应监听和变量状态改变监听
     private fun setListener() {
-        //温度控制系统打开按钮监听
-        binding.switchTemperature.setOnCheckedChangeListener { compoundButton, b ->
+        //风扇系统打开按钮监听
+        binding.switchFan.setOnCheckedChangeListener { compoundButton, b ->
             if (b) {
                 //打开后从这里处理
-                consoleViewModel.sendData("L")
-                consoleViewModel.setNetWorkStatus("温度控制系统已开启")
+                consoleViewModel.sendData("1")
+                consoleViewModel.setNetWorkStatus("风扇已开启")
             } else {
-                consoleViewModel.sendData("S")
-                consoleViewModel.setNetWorkStatus("温度控制系统已关闭")
+                consoleViewModel.sendData("2")
+                consoleViewModel.setNetWorkStatus("风扇已关闭")
             }
-            consoleViewModel.acSwitchStatus(b)
+            consoleViewModel.fanSwitchStatus(b)
         }
 
-        //
+        //加热系统打开按钮监听
+        binding.switchHot.setOnCheckedChangeListener { compoundButton, b ->
+            if (b) {
+                //打开后从这里处理
+                consoleViewModel.sendData("3")
+                consoleViewModel.setNetWorkStatus("房间加热已开启")
+            } else {
+                consoleViewModel.sendData("4")
+                consoleViewModel.setNetWorkStatus("房间加热已关闭")
+            }
+            consoleViewModel.hotSwitchStatus(b)
+        }
+
+        //设定温度的滑条，设定温度的范围是15-30度
         binding.sbTemperature.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             var temperature: Int = 15
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {

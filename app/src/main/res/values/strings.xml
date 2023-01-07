@@ -1,15 +1,15 @@
 <resources>
-    <string name="app_name">家庭温控</string>
+    <string name="app_name">温度控制app</string>
     <string name="navigation_drawer_open">打开导航栏</string>
     <string name="navigation_drawer_close">关闭导航栏</string>
-    <string name="nav_header_title">用户</string>
-    <string name="nav_header_subtitle">邮箱</string>
-    <string name="nav_header_desc">导航头文件</string>
-    <string name="action_settings">设置</string>
+    <string name="nav_header_title">User</string>
+    <string name="nav_header_subtitle">Mail</string>
+    <string name="nav_header_desc">Header</string>
+    <string name="action_settings">Setting</string>
 
-    <string name="menu_home">家居</string>
+    <string name="menu_home">WLAN列表</string>
     <string name="menu_console">控制台</string>
-    <string name="menu_datacenter">数据中心</string>
+    <string name="menu_datacenter">数据</string>
 
     <string name="connection_succeed">连接WLAN成功</string>
 </resources>

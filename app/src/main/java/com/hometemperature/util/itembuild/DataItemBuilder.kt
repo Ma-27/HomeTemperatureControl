@@ -34,8 +34,10 @@ class DataItemBuilder {
             //发送数据时，显示提示信息设置
             if (type == MessageType.MESSAGE_SEND) {
                 event = when (data) {
-                    "L", "l", "开启空调" -> "温度控制系统开启"
-                    "S", "s", "关闭空调" -> "温度控制系统关闭"
+                    "1" -> "开启风扇"
+                    "2" -> "关闭风扇"
+                    "3" -> "房间加热系统开启"
+                    "4" -> "房间加热系统关闭"
                     else -> "发送内容："
                 }
 

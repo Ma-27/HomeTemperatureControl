@@ -17,33 +17,45 @@ class ConsoleViewModel(application: Application) : AndroidViewModel(application)
     )
     var repository: AppRepository = _repository
 
-    //TODO 缓存温度调节的目标温度
+    //缓存温度调节的目标温度
     private val _targetTemperature = MutableLiveData<Int>().apply {
         value = 15
     }
     val targetTemperature: LiveData<Int>
         get() = _targetTemperature
 
-    //TODO 缓存温度调节的当前温度
+    //缓存温度调节的当前温度
     private val _currentTemperature = _repository.currentTemperature
     val currentTemperature: LiveData<Float>
         get() = _currentTemperature
 
-    //TODO 空调系统的开关
-    private val _acSwitch = MutableLiveData<Boolean>().apply {
+    //风扇系统的开关
+    private val _fanSwitch = MutableLiveData<Boolean>().apply {
         value = false
     }
-    val acSwitch: LiveData<Boolean>
-        get() = _acSwitch
+    val fanSwitch: LiveData<Boolean>
+        get() = _fanSwitch
+
+    //加热系统的开关
+    private val _hotSwitch = MutableLiveData<Boolean>().apply {
+        value = false
+    }
+    val hotSwitch: LiveData<Boolean>
+        get() = _hotSwitch
 
     //提示网络状态信息
     fun setNetWorkStatus(message: String) {
         repository.setNetWorkStatus(message)
     }
 
-    //更改空调开启或者关闭
-    fun acSwitchStatus(value: Boolean) {
-        _acSwitch.value = value
+    //更改风扇开启或者关闭
+    fun fanSwitchStatus(value: Boolean) {
+        _fanSwitch.value = value
+    }
+
+    //更改加热系统开启或者关闭
+    fun hotSwitchStatus(value: Boolean) {
+        _hotSwitch.value = value
     }
 
     //将接收和发送的数据存入列表

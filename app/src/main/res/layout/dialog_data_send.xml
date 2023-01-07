@@ -13,7 +13,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/bg_item_list"
-        android:padding="20sp">
+        android:padding="@dimen/space5"
+        android:paddingStart="@dimen/space20"
+        android:paddingEnd="@dimen/space20">
 
         <EditText
             android:id="@+id/et_wifi_data"

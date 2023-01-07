@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         //请求权限，处理权限问题
         permissionRequest()
 
-        //TODO 初始化视图布局
+        //初始化视图布局
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -125,7 +125,7 @@ class MainActivity : AppCompatActivity() {
                 ) else null
 
             //如果是创建发送缓存之初变化，则不发送数据，否则发送数据;
-            // TODO 为了防止重复发送，如果在on start中live data收到更新，则不应该发送。这里检查时间戳。如果该数据要发送而尚未发送，该数据必然在排在最前面，使用get获取最前面的元素判断是否已发送。
+            //为了防止重复发送，如果在on start中live data收到更新，则不应该发送。这里检查时间戳。如果该数据要发送而尚未发送，该数据必然在排在最前面，使用get获取最前面的元素判断是否已发送。
             if (dataItem != null) {
                 if (it != TestFlag.SEND &&
                     (dataItem.timestamp != viewModel.latestItemTimestamp.value || viewModel.latestItemTimestamp.value == 0L)
@@ -165,8 +165,8 @@ class MainActivity : AppCompatActivity() {
                     //修改时间为两者一样，防止下次重复添加，重复执行命令
                     viewModel.modifyLatestTimestamp(dataItem.timestamp)
                     Timber.d("接收到新数据")
-                    //TODO 解码，翻译命令
-                    //FIXME 由于接收到的即为温度，则直接将内容提取出来并且转换就行了
+                    //解码，翻译命令
+                    //由于接收到的即为温度，则直接将内容提取出来并且转换就行了
                     viewModel.modifyCurrentTemperature(DataItemBuilder.formatTemperature(dataItem.data))
                 }
             }
