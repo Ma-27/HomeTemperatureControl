@@ -12,7 +12,7 @@ import com.hometemperature.ui.home.WifiListAdapter
 
 class BindingAdapter
 
-//TODO set the list in view model and bind wifi list to recycler view
+//set the list in view model and bind wifi list to recycler view
 @BindingAdapter("setWifiDataList")
 fun commitWifiList(listView: RecyclerView, items: List<WifiItem>?) {
     items?.let {
@@ -20,7 +20,7 @@ fun commitWifiList(listView: RecyclerView, items: List<WifiItem>?) {
     }
 }
 
-//TODO set the list in view model and bind data to data center recycler view
+//set the list in view model and bind data to data center recycler view
 @BindingAdapter("setDataCenterList")
 fun commitDataCenterList(listView: RecyclerView, items: MutableList<DataItem>?) {
     items?.let {
@@ -28,7 +28,7 @@ fun commitDataCenterList(listView: RecyclerView, items: MutableList<DataItem>?) 
     }
 }
 
-//TODO
+//set the visibility of send and receive message item
 //flag 0 imply the view is a receiver view,flag 1 imply the view is a sender view;flag can only be passed by 0 or 1.
 @BindingAdapter("messagetype", "flag")
 fun itemVisibility(view: RelativeLayout, messageType: Int, flag: Int) {

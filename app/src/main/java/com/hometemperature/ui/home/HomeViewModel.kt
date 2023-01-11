@@ -15,10 +15,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     var usageCount: Int = 0
     var usageCount1: Int = 0
 
-    private val _repository: AppRepository = AppRepository.getInstance(
-        NetWorkServiceFactory().buildIotConnectionService(application),
-        NetWorkServiceFactory().buildIotTransmissionService()
-    )
+    private val _repository: AppRepository by lazy {
+        AppRepository.getInstance(
+            NetWorkServiceFactory.buildIotConnectionService(application),
+            NetWorkServiceFactory.buildIotTransmissionService()
+        )
+    }
     var repository: AppRepository = _repository
 
     //菜单中刷新按钮是否按下
@@ -33,6 +35,12 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     //当前应用使用的socket
     private val _socket = _repository.socket
     var socket: LiveData<Socket> = _socket
+
+
+    init {
+
+    }
+
 
     /**
      * 各自字段的setter方法
@@ -92,7 +100,4 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    init {
-
-    }
 }

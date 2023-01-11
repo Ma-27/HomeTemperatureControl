@@ -10,10 +10,12 @@ import com.hometemperature.network.NetWorkServiceFactory
 import timber.log.Timber
 
 class DataCenterViewModel(application: Application) : AndroidViewModel(application) {
-    private val _repository: AppRepository = AppRepository.getInstance(
-        NetWorkServiceFactory().buildIotConnectionService(application),
-        NetWorkServiceFactory().buildIotTransmissionService()
-    )
+    private val _repository: AppRepository by lazy {
+        AppRepository.getInstance(
+            NetWorkServiceFactory.buildIotConnectionService(application),
+            NetWorkServiceFactory.buildIotTransmissionService()
+        )
+    }
     var repository: AppRepository = _repository
 
     //检查网络状态，暂存网络状态

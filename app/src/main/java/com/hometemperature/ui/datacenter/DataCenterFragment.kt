@@ -76,7 +76,7 @@ class DataCenterFragment : Fragment() {
     private fun setupAdapter() {
         val viewModel = binding.viewmodel
         if (viewModel != null) {
-            //TODO 初始化recycler view adapter也在这里设置点击监听
+            //XXX 初始化recycler view adapter也在这里设置点击监听
             listAdapter = DataCenterListAdapter(DataCenterClickListener { it ->
 
             })

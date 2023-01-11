@@ -11,30 +11,38 @@ import com.hometemperature.network.NetWorkServiceFactory
 import com.hometemperature.util.itembuild.DataItemBuilder
 
 class ConsoleViewModel(application: Application) : AndroidViewModel(application) {
-    private val _repository: AppRepository = AppRepository.getInstance(
-        NetWorkServiceFactory().buildIotConnectionService(application),
-        NetWorkServiceFactory().buildIotTransmissionService()
-    )
+    private val _repository: AppRepository by lazy {
+        AppRepository.getInstance(
+            NetWorkServiceFactory.buildIotConnectionService(application),
+            NetWorkServiceFactory.buildIotTransmissionService()
+        )
+    }
     var repository: AppRepository = _repository
 
-    //TODO 缓存温度调节的目标温度
+    //缓存温度调节的目标温度
     private val _targetTemperature = MutableLiveData<Int>().apply {
         value = 15
     }
     val targetTemperature: LiveData<Int>
         get() = _targetTemperature
 
-    //TODO 缓存温度调节的当前温度
+    //缓存温度调节的当前温度
     private val _currentTemperature = _repository.currentTemperature
     val currentTemperature: LiveData<Float>
         get() = _currentTemperature
 
-    //TODO 空调系统的开关
+    //空调系统的开关
     private val _acSwitch = MutableLiveData<Boolean>().apply {
         value = false
     }
     val acSwitch: LiveData<Boolean>
         get() = _acSwitch
+
+
+    init {
+
+    }
+
 
     //提示网络状态信息
     fun setNetWorkStatus(message: String) {

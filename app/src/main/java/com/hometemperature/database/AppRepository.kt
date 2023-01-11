@@ -34,56 +34,58 @@ class AppRepository(
             iotConnection: IotConnection,
             iotTransmission: IotTransmission
         ): AppRepository {
-            synchronized(this) {
-                var instance = INSTANCE
-
-                if (instance == null) {
-                    instance = AppRepository(iotConnection, iotTransmission)
-                    INSTANCE = instance
+            if (INSTANCE == null) {
+                synchronized(this) {
+                    if (INSTANCE == null) {
+                        INSTANCE = AppRepository(iotConnection, iotTransmission)
+                    }
                 }
-
-                // 返回一个Repository实例
-                return instance
             }
+            // 返回一个Repository实例
+            return INSTANCE!!
+        }
+
+        init {
+
         }
     }
 
 
-    //TODO 菜单中刷新按钮是否按下
+    //菜单中刷新按钮是否按下
     private val _refreshIsChecked = MutableLiveData<Boolean>().apply {
         value = false
     }
     val refreshIsChecked: LiveData<Boolean>
         get() = _refreshIsChecked
 
-    //TODO 菜单中显示的wifi列表
+    //单中显示的wifi列表
     private val _wifiList = MutableLiveData<List<WifiItem>>().apply {
         value = emptyList<WifiItem>()
     }
     var wifiList: LiveData<List<WifiItem>> = _wifiList
 
-    //TODO SnackBar提示字符串变量
+    //SnackBar提示字符串变量
     private val _networkStatus = MutableLiveData<String>().apply {
         value = "向下滑动来刷新WLAN列表"
     }
     val networkStatus: LiveData<String>
         get() = _networkStatus
 
-    //TODO 特定wifi的属性集合
+    //特定wifi的属性集合
     private val _wifiItem = MutableLiveData<WifiItem>().apply {
         value = WifiItemBuilder.buildWifiItem()
     }
     val wifiItem: LiveData<WifiItem>
         get() = _wifiItem
 
-    //TODO socket设置
+    //socket设置
     private val _socket = MutableLiveData<Socket>().apply {
         value = Socket()
     }
     val socket: LiveData<Socket>
         get() = _socket
 
-    //TODO 数据中心中显示的数据列表
+    //数据中心中显示的数据列表
     //为了应对set value 导致的list同步问题，如果需要更改该list，需要同步更改mdataList和dataList
     private val mdataList: MutableList<DataItem> = ArrayList()
     private val _dataList = MutableLiveData<MutableList<DataItem>>().apply {
@@ -91,7 +93,7 @@ class AppRepository(
     }
     var dataList: LiveData<MutableList<DataItem>> = _dataList
 
-    //TODO 要接收的数据缓存（相比起数据列表更容易access）
+    //要接收的数据缓存（相比起数据列表更容易access）
     private val _dataReceiveCache = MutableLiveData<String>().apply {
         //默认值为TestFlag.RECEIVE
         value = TestFlag.RECEIVE
@@ -99,7 +101,7 @@ class AppRepository(
     val dataReceiveCache: LiveData<String>
         get() = _dataReceiveCache
 
-    //TODO 要发送的数据缓存（相比起数据列表更容易access）
+    //要发送的数据缓存（相比起数据列表更容易access）
     private val _dataSendCache = MutableLiveData<String>().apply {
         //默认值为TestFlag.SEND
         value = TestFlag.SEND
@@ -107,12 +109,13 @@ class AppRepository(
     val dataSendCache: LiveData<String>
         get() = _dataSendCache
 
-    //TODO 缓存温度调节的当前温度
+    //缓存温度调节的当前温度
     private val _currentTemperature = MutableLiveData<Float>().apply {
         value = 13.8f
     }
     val currentTemperature: LiveData<Float>
         get() = _currentTemperature
+
 
     /**
      * 各自字段的setter方法

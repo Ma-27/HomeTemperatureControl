@@ -83,7 +83,7 @@ class HomeFragment : Fragment() {
 
 
         //socket发生改变时通知repository刷新socket
-        //FIXME 粗浅的修补了bug：切换时防止为空集合
+        //XXX 粗浅的修补了bug：切换时防止为空集合
         homeViewModel.socket.observe(viewLifecycleOwner, Observer {
             if (homeViewModel.usageCount != 0 && homeViewModel.repository.wifiItem.value!!.isConnected == "已连接") {
                 homeViewModel.notifySocketChanged(homeViewModel.repository)
@@ -99,7 +99,7 @@ class HomeFragment : Fragment() {
     private fun setupAdapter() {
         val viewModel = binding.viewmodel
         if (viewModel != null) {
-            //TODO 初始化recycler view adapter也在这里设置点击监听，点击即弹出对话框配置网络参数
+            //XXX 初始化recycler view adapter也在这里设置点击监听，点击即弹出对话框配置网络参数
             listAdapter = WifiListAdapter(WifiListClickListener { item ->
                 showWifiItemDetail(item)
                 Timber.d("成功点击$item")

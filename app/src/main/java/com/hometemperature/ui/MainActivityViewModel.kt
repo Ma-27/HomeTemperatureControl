@@ -15,10 +15,12 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
-    private val _repository: AppRepository = AppRepository.getInstance(
-        NetWorkServiceFactory().buildIotConnectionService(application),
-        NetWorkServiceFactory().buildIotTransmissionService()
-    )
+    private val _repository: AppRepository by lazy {
+        AppRepository.getInstance(
+            NetWorkServiceFactory.buildIotConnectionService(application),
+            NetWorkServiceFactory.buildIotTransmissionService()
+        )
+    }
     var repository: AppRepository = _repository
 
     //检查网络状态，暂存网络状态
@@ -46,6 +48,12 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     //发送和接受数据的列表
     private val _dataList = repository.dataList
     var dataList: LiveData<MutableList<DataItem>> = _dataList
+
+
+    init {
+
+    }
+
 
     //发送数据到已连接的主机。注意：该方法为网络方法，要在网络进程中处理
     fun sendDataToHost() {
